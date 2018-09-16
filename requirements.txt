@@ -1,0 +1,4 @@
+Flask
+ecdsa
+requests
+flask-sqlalchemy
