@@ -25,6 +25,7 @@ log.setLevel(logging.ERROR)
 
 @node.route('/blocks', methods=['GET','POST'])
 def get_blocks():
+    chain_to_send = variables.BLOCKCHAIN
     # Load current blockchain. Only you should update your blockchain
     if request.args.get("update") == User.public_key:
         qget= q.get()
@@ -35,7 +36,7 @@ def get_blocks():
         if str(ip) != "127.0.0.1" and ip not in variables.PEER_NODES:
             print("added", ip)
             variables.PEER_NODES.append(str(ip))
-    chain_to_send = variables.BLOCKCHAIN
+
     # Converts our blocks into dictionaries so we can send them as json objects later
     chain_to_send_json = []
     for block in chain_to_send:
