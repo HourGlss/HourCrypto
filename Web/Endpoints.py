@@ -31,6 +31,7 @@ def get_blocks():
         qget= q.get()
         qfrom = qget[0]
         variables.BLOCKCHAIN = qget[1]
+        print(qfrom)
     ip = request.remote_addr
     if request.method == 'POST':
         if str(ip) != "127.0.0.1" and ip not in variables.PEER_NODES:
@@ -39,6 +40,7 @@ def get_blocks():
 
     # Converts our blocks into dictionaries so we can send them as json objects later
     chain_to_send_json = []
+    print(chain_to_send)
     for block in chain_to_send:
         chain_to_send_json.append(block.exportjson())
 
