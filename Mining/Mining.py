@@ -95,9 +95,9 @@ def mine(a):
     else:
         # See if we got any blocks from someone, save it
         variables.BLOCKCHAIN = blockchain
-        a.put(Utility.buildmessage("blockchain", blockchain))
-        requests.post(
-            "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/blocks?update=" + User.public_key)
+    a.put(Utility.buildmessage("blockchain", blockchain))
+    requests.post(
+        "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/blocks?update=" + User.public_key)
     print(variables.BLOCKCHAIN[0])
     while True:
         last_block = variables.BLOCKCHAIN[len(variables.BLOCKCHAIN) - 1]
