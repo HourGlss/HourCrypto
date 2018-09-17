@@ -20,6 +20,7 @@ def consensus():
         if Utility.validate_blockchain(other_chains[i]):
             chain_length = len(other_chains[i])
             if chain_length > max_length:
+                max_length = chain_length
                 longest = i
     if len(other_chains[longest]) == len(variables.BLOCKCHAIN):
         return False
