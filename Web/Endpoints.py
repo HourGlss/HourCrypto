@@ -113,7 +113,3 @@ def get_balance():
         balances_json.append(account)
 
     return json.dumps(balances_json)
-
-@node.route('/test', methods=['GET'])
-def test():
-    return "sent\n"

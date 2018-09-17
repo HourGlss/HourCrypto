@@ -113,7 +113,6 @@ def mine(a):
         pow, pow_output = proof_of_work(a, last_block, variables.PENDING_TRANSACTIONS)
         variables.PENDING_TRANSACTIONS = []
         if pow:
-            print(pow_output)
             variables.BLOCKCHAIN.append(pow_output)
         else:
             variables.BLOCKCHAIN = pow_output
