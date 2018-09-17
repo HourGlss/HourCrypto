@@ -21,9 +21,9 @@ def consensus():
             chain_length = len(other_chains[i])
             if chain_length > max_length:
                 longest = i
-    if len(other_chains[i]) == len(variables.BLOCKCHAIN):
+    if len(other_chains[longest]) == len(variables.BLOCKCHAIN):
         return False
-    return other_chains[i]
+    return other_chains[longest]
 
 
 def find_new_chains():
