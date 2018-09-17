@@ -10,6 +10,7 @@ import Mining.Variables as variables
 node = Flask(__name__)
 q = None
 def start(a):
+    global q
     q = a
     global node
     node.config['SECRET_KEY'] = Utility.createHexdigest(User.password)
