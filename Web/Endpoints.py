@@ -31,6 +31,7 @@ def get_blocks():
         qget= q.get()
         qfrom = qget[0]
         variables.BLOCKCHAIN = qget[1]
+        chain_to_send = variables.BLOCKCHAIN
         print(qfrom)
     ip = request.remote_addr
     if request.method == 'POST':
