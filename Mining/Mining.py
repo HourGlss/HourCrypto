@@ -4,7 +4,7 @@ import time
 from Mining.Block import Block
 import Mining.Variables as variables
 import Utilities.Utility as Utility
-import User.user as User
+import User.User as User
 
 
 def consensus():
