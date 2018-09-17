@@ -14,7 +14,7 @@ def consensus():
     # Get the blocks from other nodes
     other_chains = find_new_chains()
     # If our chain isn't longest, then we store the longest chain
-    longest = None
+    longest = 0
     max_length = 0
     for i in range(len(other_chains)):
         if Utility.validate_blockchain(other_chains[i]):
@@ -95,7 +95,7 @@ def mine(a):
     else:
         # See if we got any blocks from someone, save it
         variables.BLOCKCHAIN = blockchain
-    a.put(Utility.buildmessage("blockchain", blockchain))
+    a.put(Utility.buildmessage("blockchain", variables.BLOCKCHAIN))
     requests.post(
         "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/blocks?update=" + User.public_key)
     print(variables.BLOCKCHAIN[0])
