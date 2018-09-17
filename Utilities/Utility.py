@@ -1,9 +1,16 @@
+import base64
 import hashlib
 import secrets
 import string
 
+from ecdsa import ecdsa
+
+
+def buildmessage(type,data):
+    return (type,data)
 def buildpow(index,timestamp,effort,data,previous_hash):
-    m = hashlib.sha256()
+    m: hashlib.Hash = hashlib.sha256()
+
     m.update((str(index) + str(timestamp) + str(effort) + str(data) + str(previous_hash)).encode('utf-8'))
     return m
 def validate(block):

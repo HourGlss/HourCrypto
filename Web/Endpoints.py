@@ -14,7 +14,6 @@ def start(a):
     q = a
     global node
     node.config['SECRET_KEY'] = Utility.createHexdigest(User.password)
-    print("this ran")
     node.run(host="0.0.0.0", port=variables.PORT)
 
 
@@ -24,44 +23,18 @@ def start(a):
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-@node.route('/block', methods=['post'])
-def get_block():
-    ip = request.remote_addr
-    new_block_json = request.get_json()
-    new_block = Block()
-    print("trying to receieve a block from",ip)
-    new_block.importjson(new_block_json)
-    validation = Utility.validate(new_block)
-    if validation and new_block.previous_hash == variables.BLOCKCHAIN[len(variables.BLOCKCHAIN)-1].previous_hash:
-        q.put(["get_block",new_block])
-        if str(ip) != "127.0.0.1" and ip not in variables.PEER_NODES:
-            print("added",ip)
-            variables.PEER_NODES.append(str(ip))
-        BLOCKCHAIN.append(new_block)
-    else:
-        print("val",validation, "nbph",new_block.previous_hash,"aph",BLOCKCHAIN[len(BLOCKCHAIN)-1].previous_hash)
-        return "500"
-
-
-    return "200"
-
-
-
-
-
-@node.route('/blocks', methods=['GET'])
+@node.route('/blocks', methods=['GET','POST'])
 def get_blocks():
-    global BLOCKCHAIN
     # Load current blockchain. Only you should update your blockchain
     if request.args.get("update") == User.public_key:
         qget= q.get()
         qfrom = qget[0]
-        BLOCKCHAIN = qget[1]
+        variables.BLOCKCHAIN = qget[1]
     ip = request.remote_addr
     if str(ip) != "127.0.0.1" and ip not in variables.PEER_NODES:
         print("added", ip)
         variables.PEER_NODES.append(str(ip))
-    chain_to_send = BLOCKCHAIN
+    chain_to_send = variables.BLOCKCHAIN
     # Converts our blocks into dictionaries so we can send them as json objects later
     chain_to_send_json = []
     for block in chain_to_send:
@@ -103,7 +76,7 @@ def transaction():
     elif request.method == 'GET' and request.args.get("update") == User.public_key:
         pending = json.dumps(variables.PENDING_TRANSACTIONS)
         # Empty transaction list
-        variables.PENDING_TRANSACTIONS[:] = []
+        variables.PENDING_TRANSACTIONS = []
         return pending
 
 
