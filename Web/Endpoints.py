@@ -10,7 +10,6 @@ import Mining.Variables as variables
 node = Flask(__name__)
 q = None
 def start(a):
-    global q
     q = a
     global node
     node.config['SECRET_KEY'] = Utility.createHexdigest(User.password)
@@ -35,7 +34,7 @@ def get_blocks():
     if request.method == 'POST':
         if str(ip) != "127.0.0.1" and ip not in variables.PEER_NODES:
             print("added", ip)
-            variables.PEER_NODES.append(str(ip))
+            q.put(Utility.buildmessage("ip",ip))
 
     # Converts our blocks into dictionaries so we can send them as json objects later
     chain_to_send_json = []

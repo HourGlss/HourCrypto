@@ -76,6 +76,14 @@ def proof_of_work(a, last_block, data):
     while leading_zeroes < variables.WORK:
         now = time.time() + 1
         if int(now - start) % interval + 1 == 0:
+            messages = []
+            while not a.empty():
+                messages.append(a.get())
+            for message in messages:
+                if message[0] =="ip":
+                    variables.PEER_NODES.append(str(messages[1]))
+                    continue
+                a.put(message)
             start = time.time()
             consensus = consensus()
 
