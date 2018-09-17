@@ -97,6 +97,7 @@ def get_balance():
                 source = transaction['from']
                 amount = transaction['amount']
 
+
                 if type(amount) == type("string"):
                     amount = eval(amount)
 
