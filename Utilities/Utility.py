@@ -59,14 +59,15 @@ def validate_blockchain(blockchain):
         else:
             previous = blockchain[i-1].hash
         if not validate(block):
+            print("block didn't validate")
             return False
-
-        transactions = block.data['transactions']
-
-        for transaction in transactions:
+        data = block.data
+        for transaction in data:
             if transaction['from'] == "network" and transaction['amount'] != 1:
+                print("data didn't validate")
                 return False
         if previous != block.previous_hash:
+            print("previous hash didn't validate")
             return False
     return True
 

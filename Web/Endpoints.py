@@ -89,8 +89,9 @@ def get_balance():
     balances_json = []
 
     for block in working:
-        if block.data['transactions'] is not None:
-            for transaction in block.data['transactions']:
+        if block.index != 0:
+            data = block.data
+            for transaction in data:
                 to = transaction['to']
                 source = transaction['from']
                 amount = transaction['amount']

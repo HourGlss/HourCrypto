@@ -14,7 +14,6 @@ def consensus():
     # Get the blocks from other nodes
     other_chains = find_new_chains()
     # If our chain isn't longest, then we store the longest chain
-    other_chains.append(variables.BLOCKCHAIN)
     longest = None
     max_length = 0
     for i in range(len(other_chains)):
@@ -22,21 +21,21 @@ def consensus():
             chain_length = len(other_chains[i])
             if chain_length > max_length:
                 longest = i
-    if other_chains[i] == variables.BLOCKCHAIN:
+    if len(other_chains[i]) == len(variables.BLOCKCHAIN):
         return False
     return other_chains[i]
 
 
-def find_new_chains(peers):
+def find_new_chains():
     # Get the blockchains of every other node
+    peers = variables.PEER_NODES
     other_chains = []
     for node_url in peers:
 
         blockchain_json = None
         found_blockchain = []
         url = "http://" + node_url + ":" + str(variables.PORT) + "/blocks"
-        blockchain_json = requests.get(url)
-
+        blockchain_json = requests.post(url)
         # Convert the JSON object to a Python dictionary
         if blockchain_json is not None:
             blockchain_json = json.loads(blockchain_json.content)
@@ -62,9 +61,9 @@ def create_genesis_block():
     pad = "1337"
     for i in range(4, 64):
         pow += pad[i % len(pad)]
-    b = Block(0, time.time(), pow, "e", {
-        "transactions": None},
+    b = Block(0, time.time(), pow, "e", [],
               "0")
+    b.data.append({"FROM": 0,"TO":0,"AMOUNT":0})
     return b
 
 
@@ -78,6 +77,7 @@ def proof_of_work(a, last_block, data):
         if int(now - start) % interval + 1 == 0:
             start = time.time()
             consensus = consensus()
+
             if consensus:
                 return False, consensus
         effort, pow_hash_object = Utility.genhash(last_block.index + 1, now, data, last_block.hash)
@@ -89,6 +89,7 @@ def mine(a):
     # See if other blockchains exist
     blockchain = consensus()
     if not blockchain:
+        print("need to make one")
         # We didn't find one, need to make one
         variables.BLOCKCHAIN.append(create_genesis_block())
     else:
@@ -98,7 +99,6 @@ def mine(a):
         requests.post(
             "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/blocks?update=" + User.public_key)
     print(variables.BLOCKCHAIN[0])
-
     while True:
         last_block = variables.BLOCKCHAIN[len(variables.BLOCKCHAIN) - 1]
         #   -get transactions
