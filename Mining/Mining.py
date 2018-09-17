@@ -11,8 +11,15 @@ def consensus():
     peers = variables.PEER_NODES
     if len(peers) == 0:
         return False
+
+
     # Get the blocks from other nodes
     other_chains = find_new_chains()
+    if type(other_chains[0]) != type([]):
+        if len(other_chains) < len(variables.BLOCKCHAIN):
+            return False
+        else:
+            return other_chains
     # If our chain isn't longest, then we store the longest chain
     longest = 0
     max_length = 0
