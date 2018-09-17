@@ -15,6 +15,9 @@ def consensus():
 
     # Get the blocks from other nodes
     other_chains = find_new_chains()
+    if len(other_chains) == 0:
+        print("no chains found")
+        return False
     if type(other_chains[0]) != type([]):
         if len(other_chains) < len(variables.BLOCKCHAIN):
             return False
@@ -71,7 +74,7 @@ def create_genesis_block():
         pow += pad[i % len(pad)]
     b = Block(0, time.time(), pow, "e", [],
               "0")
-    b.data.append({"FROM": 0,"TO":0,"AMOUNT":0})
+    b.data=[{"FROM": 0,"TO":0,"AMOUNT":0}]
     return b
 
 
