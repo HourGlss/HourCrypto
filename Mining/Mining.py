@@ -50,6 +50,7 @@ def find_new_chains():
         # Convert the JSON object to a Python dictionary
         if blockchain_json is not None:
             blockchain_json = json.loads(blockchain_json.content)
+            print(blockchain_json.content)
             for block_json in blockchain_json:
                 temp = Block()
                 temp.importjson(block_json)
