@@ -50,7 +50,6 @@ def find_new_chains():
         # Convert the JSON object to a Python dictionary
         if blockchain_json is not None:
             blockchain_json = json.loads(blockchain_json.content)
-            print(blockchain_json)
             for block_json in blockchain_json:
                 temp = Block()
                 temp.importjson(block_json)
@@ -118,7 +117,6 @@ def mine(a):
     a.put(Utility.buildmessage("blockchain", variables.BLOCKCHAIN))
     requests.post(
         "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/blocks?update=" + User.public_key)
-    print(variables.BLOCKCHAIN[0])
     while True:
         last_block = variables.BLOCKCHAIN[len(variables.BLOCKCHAIN) - 1]
         #   -get transactions
