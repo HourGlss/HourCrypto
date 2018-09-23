@@ -39,10 +39,11 @@ def get_blocks():
 
     # Converts our blocks into dictionaries so we can send them as json objects later
     chain_to_send_json = []
-    if type(chain_to_send[0]) == 'str':
-        print(chain_to_send[0])
     for block in chain_to_send:
-        chain_to_send_json.append(block.exportjson())
+        try:
+            chain_to_send_json.append(block.exportjson())
+        except AttributeError:
+            print("This is not a block",chain_to_send[0])
 
     # Send our chain to whomever requested it
     chain_to_send = json.dumps(chain_to_send_json)
