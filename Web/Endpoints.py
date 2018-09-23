@@ -42,6 +42,7 @@ def get_blocks():
     # Converts our blocks into dictionaries so we can send them as json objects later
     chain_to_send_json = []
     print(chain_to_send)
+    print("/block", type(chain_to_send[0]))
     for block in chain_to_send:
         chain_to_send_json.append(block.exportjson())
 
