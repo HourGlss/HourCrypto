@@ -12,6 +12,7 @@ def welcome_msg():
 if __name__ == '__main__':
 
     welcome_msg()
+
     a = Queue()
     p2 = Process(target=Web.start, args=(a,))
     p2.start()
