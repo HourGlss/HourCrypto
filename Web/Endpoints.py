@@ -2,6 +2,7 @@ from flask import Flask, request
 import json
 import requests
 import logging
+import inspect
 
 import Utilities.Utility as Utility
 from Mining.Block import Block
@@ -25,14 +26,17 @@ log.setLevel(logging.ERROR)
 
 @node.route('/blocks', methods=['GET','POST'])
 def get_blocks():
+    func = inspect.currentframe().f_back.f_code
     chain_to_send = variables.BLOCKCHAIN
     # Load current blockchain. Only you should update your blockchain
+    qfrom = "other"
     if request.args.get("update") == User.public_key:
         qget= q.get()
         qfrom = qget[0]
         variables.BLOCKCHAIN = qget[1]
         chain_to_send = variables.BLOCKCHAIN
     ip = request.remote_addr
+    logging.info("ip:{} self:{}".format(ip,qfrom))
     if request.method == 'POST':
         if str(ip) != "127.0.0.1" and ip not in variables.PEER_NODES:
             q.put(Utility.buildmessage("ip",ip))
@@ -52,6 +56,8 @@ def get_blocks():
 
 @node.route('/txion', methods=['GET', 'POST'])
 def transaction():
+    func = inspect.currentframe().f_back.f_code
+
     if request.method == 'POST':
         # On each new POST request, we extract the transaction data
         new_txion = request.get_json()
@@ -87,6 +93,7 @@ def transaction():
 
 @node.route('/balances', methods=['GET'])
 def get_balance():
+    func = inspect.currentframe().f_back.f_code
 
     working = variables.BLOCKCHAIN
     balances = {}

@@ -1,3 +1,65 @@
+'''
+
+
+
+
+
+LEGACY CODE
+
+
+
+
+Only use this to steal ideas from
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import time
 import hashlib
 import sys
@@ -106,16 +168,10 @@ def mine(a, blockchain, node_pending_transactions):
         else:
             mined_block = proof[1]
 
-            '''
             String
-            '''
             print("#",mined_block)
-            '''
             String
-            '''
-            '''
             REPR
-            '''
             # print("b{} = ".format(mined_block.index), repr(mined_block))
             # if last_block.index == 1:
             #     print('work = {}'.format(work))
@@ -125,9 +181,7 @@ def mine(a, blockchain, node_pending_transactions):
             #     print("]")
             #     sys.exit()
 
-            '''
             END REPR
-            '''
 
             BLOCKCHAIN.append(mined_block)
             a.put(["mined_lower",BLOCKCHAIN])
@@ -147,7 +201,7 @@ def mine(a, blockchain, node_pending_transactions):
 
 
 
-
+'''
 
 
 

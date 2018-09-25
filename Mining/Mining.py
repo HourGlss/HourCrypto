@@ -6,9 +6,14 @@ import Mining.Variables as variables
 import Utilities.Utility as Utility
 import User.User as User
 
+import inspect
+import logging
 
 def consensus():
+    func = inspect.currentframe().f_back.f_code
+
     peers = variables.PEER_NODES
+    logging.info("peers: {}".format(peers))
     if len(peers) == 0:
         return False
 
@@ -16,10 +21,11 @@ def consensus():
     # Get the blocks from other nodes
     other_chains = find_new_chains()
     if len(other_chains) == 0:
-        print("no chains found")
+        logging.info("no chains found")
         return False
     if type(other_chains[0]) != type([]):
         if len(other_chains) < len(variables.BLOCKCHAIN):
+            logging.info("Our blockchain is bigger")
             return False
         else:
             return other_chains
@@ -33,11 +39,13 @@ def consensus():
                 max_length = chain_length
                 longest = i
     if len(other_chains[longest]) == len(variables.BLOCKCHAIN):
+        logging.info("Our blockchain is the same size1")
         return False
     return other_chains[longest]
 
 
 def find_new_chains():
+    func = inspect.currentframe().f_back.f_code
     # Get the blockchains of every other node
     peers = variables.PEER_NODES
     other_chains = []
@@ -64,6 +72,7 @@ def find_new_chains():
 
 
 def create_genesis_block():
+    func = inspect.currentframe().f_back.f_code
     """To create each block, it needs the hash of the previous one. First
     block has no previous, so it must be created manually (with index zero
      and arbitrary previous hash)"""
@@ -79,11 +88,13 @@ def create_genesis_block():
 
 
 def proof_of_work(a, last_block, data):
+    func = inspect.currentframe().f_back.f_code
     start = time.time()
     interval = 20
+    now = time.time() + 1
     effort, pow_hash_object = Utility.genhash(last_block.index + 1, time.time(), data, last_block.hash)
     leading_zeroes = Utility.leadingzeroes(pow_hash_object.digest())
-    while leading_zeroes < variables.WORK:
+    while leading_zeroes <= variables.WORK:
         now = time.time() + 1
         if int(now - start) % interval + 1 == 0:
             messages = []
@@ -105,6 +116,8 @@ def proof_of_work(a, last_block, data):
 
 
 def mine(a):
+    func = inspect.currentframe().f_back.f_code
+
     # See if other blockchains exist
     blockchain = consensus()
     if not blockchain:
