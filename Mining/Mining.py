@@ -11,9 +11,9 @@ import logging
 
 def consensus():
     func = inspect.currentframe().f_back.f_code
-
+    logging.info("Starting Consensus")
     peers = variables.PEER_NODES
-    logging.info("peers: {}".format(peers))
+    logging.debug("Peers: {}".format(peers))
     if len(peers) == 0:
         return False
 
@@ -21,11 +21,11 @@ def consensus():
     # Get the blocks from other nodes
     other_chains = find_new_chains()
     if len(other_chains) == 0:
-        logging.info("no chains found")
+        logging.debug("no chains found")
         return False
     if type(other_chains[0]) != type([]):
         if len(other_chains) < len(variables.BLOCKCHAIN):
-            logging.info("Our blockchain is bigger")
+            logging.debug("Our blockchain is bigger")
             return False
         else:
             return other_chains
@@ -39,22 +39,33 @@ def consensus():
                 max_length = chain_length
                 longest = i
     if len(other_chains[longest]) == len(variables.BLOCKCHAIN):
-        logging.info("Our blockchain is the same size1")
+        logging.debug("Our blockchain is the same size1")
         return False
+    logging.info("Ending Consensus")
+    logging.debug("Consensus returned: {}".format(other_chains[longest]))
     return other_chains[longest]
 
 
 def find_new_chains():
     func = inspect.currentframe().f_back.f_code
+    logging.info("Starting to find new chains")
     # Get the blockchains of every other node
     peers = variables.PEER_NODES
+    logging.debug("peers: {}".format(len(peers)))
     other_chains = []
     for node_url in peers:
 
         blockchain_json = None
         found_blockchain = []
+
         url = "http://" + node_url + ":" + str(variables.PORT) + "/blocks"
-        blockchain_json = requests.post(url)
+        try:
+            logging.debug("Attempting to access {}".format(node_url))
+            blockchain_json = requests.post(url)
+        except:
+            logging.warning("Failed to access {}, removing from peers".format(node_url))
+            variables.PEER_NODES.remove(node_url)
+            continue
         # Convert the JSON object to a Python dictionary
         if blockchain_json is not None:
             blockchain_json = json.loads(blockchain_json.content)
@@ -62,20 +73,27 @@ def find_new_chains():
                 temp = Block()
                 temp.importjson(block_json)
                 if Utility.validate(temp):
+                    logging.debug("Block validated, adding")
                     found_blockchain.append(temp)
+                else:
+                    logging.warning("Block NOT valid, next peer")
+                    continue
             # Verify other node block is correct
+            logging.debug("Attempting to valid this: {}".format(found_blockchain))
             validated = Utility.validate_blockchain(found_blockchain)
             if validated:
+                logging.debug("Blockchain did validate")
                 other_chains.append(found_blockchain)
+            else:
+                logging.warning("Blockchain did not validate")
             continue
+    logging.info("Starting to find new chains")
     return other_chains
 
 
 def create_genesis_block():
     func = inspect.currentframe().f_back.f_code
-    """To create each block, it needs the hash of the previous one. First
-    block has no previous, so it must be created manually (with index zero
-     and arbitrary previous hash)"""
+    logging.info("Creating a genesis block")
     work_ez = int(variables.WORK / 4) + 1
     pow = "0" * work_ez
     pad = "1337"
@@ -84,6 +102,7 @@ def create_genesis_block():
     b = Block(0, time.time(), pow, "e", [],
               "0")
     b.data=[{"FROM": 0,"TO":0,"AMOUNT":0}]
+    logging.info("Returning block: {}".format(b))
     return b
 
 

@@ -7,6 +7,7 @@ class Block():
     def __init__(self, index=-1, timestamp=-1, pow=-1, effort=-1, data=-1, previous_hash=-1):
         func = inspect.currentframe().f_back.f_code
         logging.info("Created a block i:{}".format(index))
+        logging.debug("Block i:{} time:{} pow:{} effort:{} data:{} prev_hash:{}".format(index,timestamp,pow,effort,data,previous_hash))
         """Returns a new Block object. Each block is "chained" to its previous
         by calling its unique hash.
 
@@ -46,10 +47,11 @@ class Block():
         m = hashlib.sha256()
         m.update((str(self.index) + str(self.timestamp) + str(self.proof_of_work) + str(self.effort) + str(
             self.data) + str(self.previous_hash)).encode('utf-8'))
+        logging.debug("Block's hash: {}".format(m.hexdigest()))
         return m.hexdigest()
 
     def exportjson(self):
-        return {
+        json = {
             "index": str(self.index),
             "timestamp": str(self.timestamp),
             "pow": str(self.proof_of_work),
@@ -58,8 +60,11 @@ class Block():
             "previous": str(self.previous_hash),
             "hash": str(self.hash)
         }
+        logging.debug("Exporting to json:{}".format(json))
+        return json
 
     def importjson(self, json):
+        logging.debug("Importing from json:{}".format(json))
         self.index = int(json['index'])
         self.timestamp = float(json['timestamp'])
         self.proof_of_work = str(json['pow'])
