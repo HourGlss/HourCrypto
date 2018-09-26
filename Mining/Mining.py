@@ -15,6 +15,7 @@ def consensus():
     peers = variables.PEER_NODES
     logging.debug("Peers: {}".format(peers))
     if len(peers) == 0:
+        logging.info("Ending consensus, we have no peers")
         return False
 
 
@@ -22,12 +23,16 @@ def consensus():
     other_chains = find_new_chains()
     if len(other_chains) == 0:
         logging.debug("no chains found")
+        logging.info("Ending consensus, no other chains found")
         return False
     if type(other_chains[0]) != type([]):
         if len(other_chains) < len(variables.BLOCKCHAIN):
             logging.debug("Our blockchain is bigger")
+            logging.info("Ending consensus, rejecting others")
             return False
         else:
+            logging.info("Ending consensus, we have one peer with a longer blockchain")
+
             return other_chains
     # If our chain isn't longest, then we store the longest chain
     longest = 0
@@ -40,8 +45,9 @@ def consensus():
                 longest = i
     if len(other_chains[longest]) == len(variables.BLOCKCHAIN):
         logging.debug("Our blockchain is the same size1")
+        logging.info("Ending consensus, rejecting others")
         return False
-    logging.info("Ending Consensus")
+    logging.info("Ending Consensus with a chain")
     logging.debug("Consensus returned: {}".format(other_chains[longest]))
     return other_chains[longest]
 
@@ -79,7 +85,7 @@ def find_new_chains():
                     logging.warning("Block NOT valid, next peer")
                     continue
             # Verify other node block is correct
-            logging.debug("Attempting to valid this: {}".format(found_blockchain))
+            logging.debug("Attempting to validate this: {}".format(found_blockchain))
             validated = Utility.validate_blockchain(found_blockchain)
             if validated:
                 logging.debug("Blockchain did validate")
