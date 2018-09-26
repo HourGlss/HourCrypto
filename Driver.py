@@ -12,6 +12,7 @@ def welcome_msg():
        """)
 
 if __name__ == '__main__':
+
     logging.debug("Display welcome")
     welcome_msg()
     logging.debug("Make a Q")
