@@ -124,18 +124,24 @@ def proof_of_work(a, last_block, data):
     while leading_zeroes <= variables.WORK:
         now = time.time() + 1
         if int(now - start) % interval + 1 == 0:
+            logging.debug("Checking for messages")
             messages = []
             while not a.empty():
-                messages.append(a.get())
+                obj = a.get()
+                logging.debug("Got {} from queue".format(obj))
+                messages.append(obj)
             for message in messages:
                 if message[0] =="ip":
+                    logging.debug("That's an ip {} adding to peers".format(message[1]))
                     variables.PEER_NODES.append(str(messages[1]))
                     continue
+                logging.debug("not an IP, putting it back message:{}".format(message))
                 a.put(message)
             start = time.time()
             consensus = consensus()
 
             if consensus:
+                logging.info("Received a consensus while doing POW")
                 return False, consensus
         effort, pow_hash_object = Utility.genhash(last_block.index + 1, now, data, last_block.hash)
         leading_zeroes = Utility.leadingzeroes(pow_hash_object.digest())
@@ -146,24 +152,31 @@ def proof_of_work(a, last_block, data):
 
 def mine(a):
     func = inspect.currentframe().f_back.f_code
-
+    logging.info("Starting to mine")
     # See if other blockchains exist
     blockchain = consensus()
     if not blockchain:
-        print("need to make one")
+        logging.info("Didn't receive a blockchain from anyone and need to make one")
         # We didn't find one, need to make one
         variables.BLOCKCHAIN.append(create_genesis_block())
     else:
+        logging.info("Received a blockchain from the net")
         # See if we got any blocks from someone, save it
         variables.BLOCKCHAIN = blockchain
-    a.put(Utility.buildmessage("blockchain", variables.BLOCKCHAIN))
-    requests.get(
-        "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/blocks?update=" + User.public_key)
+    message = Utility.buildmessage("blockchain", variables.BLOCKCHAIN)
+    logging.debug("Adding {} to queue".format(message))
+    a.put(message)
+    url = "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/blocks?update=" + User.public_key
+    logging.debug("accessing url via GET")
+    requests.get(url)
+    logging.debug("Done accessing url")
     while True:
         last_block = variables.BLOCKCHAIN[len(variables.BLOCKCHAIN) - 1]
         #   -get transactions
-        transactions = requests.get(
-            "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/txion?update=" + User.public_key).content
+        url = "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/txion?update=" + User.public_key
+        logging.debug("Getting transactions from {}".format(url))
+        transactions = requests.get(url).content
+        logging.debug("Done getting transactions")
         variables.PENDING_TRANSACTIONS = json.loads(transactions)
         variables.PENDING_TRANSACTIONS.append({
             "from": "network",
@@ -173,9 +186,14 @@ def mine(a):
         pow, pow_output = proof_of_work(a, last_block, variables.PENDING_TRANSACTIONS)
         variables.PENDING_TRANSACTIONS = []
         if pow:
+            logging.info("Mined a block {}".format(pow_output))
             variables.BLOCKCHAIN.append(pow_output)
         else:
+            logging.info("Consensus returned a blockchain {}".format(pow_output))
             variables.BLOCKCHAIN = pow_output
+        logging.debug("Adding that blockchain to the Queue")
         a.put(["mine", variables.BLOCKCHAIN])
-        requests.get(
-            "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/blocks?update=" + User.public_key)
+        url = "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/blocks?update=" + User.public_key
+        logging.debug("accessing url via GET")
+        requests.get(url)
+        logging.debug("Done accessing url")
