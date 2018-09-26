@@ -27,37 +27,49 @@ log.setLevel(logging.ERROR)
 @node.route('/blocks', methods=['GET','POST'])
 def get_blocks():
     func = inspect.currentframe().f_back.f_code
-    chain_to_send = variables.BLOCKCHAIN
+    ip = request.remote_addr
+    logging.info("/blocks accessed from {} via {}".format(ip,request.method))
+    if request.method == 'POST':
+        if str(ip) != "127.0.0.1" and ip not in variables.PEER_NODES:
+            logging.debug("We didn't know that IP, adding it to Q")
+            message  = Utility.buildmessage("ip",ip)
+            logging.debug("message: {}".format(message))
+            q.put(message)
     # Load current blockchain. Only you should update your blockchain
     qfrom = "other"
     if request.args.get("update") == User.public_key:
+        logging.debug("update was from our public, we updated our blockchain")
         qget= q.get()
+        logging.debug("qget is {}".format(qget))
         qfrom = qget[0]
         variables.BLOCKCHAIN = qget[1]
+        logging.info("Done updating our blockchain")
+
+        return "200"
+    else:
         chain_to_send = variables.BLOCKCHAIN
-    ip = request.remote_addr
-    logging.info("ip:{} self:{}".format(ip,qfrom))
-    if request.method == 'POST':
-        if str(ip) != "127.0.0.1" and ip not in variables.PEER_NODES:
-            q.put(Utility.buildmessage("ip",ip))
+        logging.debug("Chain to send:{}".format(chain_to_send))
+        logging.debug("request was not from us, we need to give them our blockchain")
+        # Converts our blocks into dictionaries so we can send them as json objects later
+        chain_to_send_json = []
+        for block in chain_to_send:
+            logging.debug("block to send TYPE:{} details:{}".format(type(block),block))
+            try:
+                chain_to_send_json.append(block.exportjson())
+            except AttributeError:
+                logging.error("This is not a block {}".format(block))
 
-    # Converts our blocks into dictionaries so we can send them as json objects later
-    chain_to_send_json = []
-    for block in chain_to_send:
-        try:
-            chain_to_send_json.append(block.exportjson())
-        except AttributeError:
-            print("This is not a block",chain_to_send[0])
-
-    # Send our chain to whomever requested it
-    chain_to_send = json.dumps(chain_to_send_json)
-    return chain_to_send
+        # Send our chain to whomever requested it
+        chain_to_send = json.dumps(chain_to_send_json)
+        logging.debug("Sending {}".format(chain_to_send))
+        logging.info("Done sending out our blockchain")
+        return chain_to_send
 
 
 @node.route('/txion', methods=['GET', 'POST'])
 def transaction():
     func = inspect.currentframe().f_back.f_code
-
+    #TODO add logging to transactions, currently we can't send and receive blocks. One problem at a time.
     if request.method == 'POST':
         # On each new POST request, we extract the transaction data
         new_txion = request.get_json()
@@ -94,7 +106,8 @@ def transaction():
 @node.route('/balances', methods=['GET'])
 def get_balance():
     func = inspect.currentframe().f_back.f_code
-
+    ip = request.remote_addr
+    logging.info("{} looked at balances".format(ip))
     working = variables.BLOCKCHAIN
     balances = {}
     balances_json = []
