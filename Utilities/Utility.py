@@ -7,19 +7,22 @@ from ecdsa import ecdsa
 import logging
 
 def buildmessage(type,data):
+    logging.debug("type: {} data:{}".format(type,data))
     return (type,data)
 def buildpow(index,timestamp,effort,data,previous_hash):
-    m: hashlib.Hash = hashlib.sha256()
-
+    m = hashlib.sha256()
     m.update((str(index) + str(timestamp) + str(effort) + str(data) + str(previous_hash)).encode('utf-8'))
     return m
 def validate(block):
+    logging.info("Validating block")
     if block.index == 0:
+        logging.debug("Block validated good")
         return True
     pow = buildpow(block.index,block.timestamp,block.effort,block.data,block.previous_hash)
     if block.proof_of_work == pow.hexdigest():
+        logging.debug("Block validated good")
         return True
-    print("bad block",block.index)
+    logging.debug("Block failed {}".format(block))
     return False
 
 def random_str():
@@ -34,6 +37,7 @@ def genhash(index,timestamp,data,last_hash):
     return effort, buildpow(index,timestamp,effort,data,last_hash)
 
 def leadingzeroes(digest):
+    #TODO I'm almost positive there's a faster way to do this
     n = 0
     result = ''.join(format(x, '08b') for x in bytearray(digest))
     for c in result:
@@ -50,6 +54,7 @@ def createHexdigest(s):
     return secret_key
 
 def validate_blockchain(blockchain):
+    logging.info("Validating blockchain")
     previous = ""
     for i in range(0,len(blockchain)-1):
         block = blockchain[i]
@@ -59,19 +64,26 @@ def validate_blockchain(blockchain):
         else:
             previous = blockchain[i-1].hash
         if not validate(block):
-            print("block didn't validate")
+            logging.debug("block didn't validate")
+            logging.info("Did not validate blockchain")
+
             return False
         data = block.data
         for transaction in data:
             if transaction['from'] == "network" and transaction['amount'] != 1:
-                print("data didn't validate")
+                logging.debug("data didn't validate")
+                logging.info("Did not validate blockchain")
+
                 return False
         if previous != block.previous_hash:
-            print("previous hash didn't validate")
+            logging.debug("previous hash didn't validate")
+            logging.info("Did not validate blockchain")
             return False
+    logging.info("Validated")
     return True
 
 def validate_signature(public_key, signature, message):
+    #TODO I have never tested this
     """Verifies if the signature is correct. This is used to prove
     it's you (and not someone else) trying to do a transaction with your
     address. Called when a user tries to submit a new transaction.
