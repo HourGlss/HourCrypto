@@ -94,6 +94,7 @@ def find_new_chains():
 def create_genesis_block():
     func = inspect.currentframe().f_back.f_code
     logging.info("Creating a genesis block")
+    logging.debug("Work:{}".format(variables.WORK))
     work_ez = int(variables.WORK / 4) + 1
     pow = "0" * work_ez
     pad = "1337"
@@ -108,6 +109,7 @@ def create_genesis_block():
 
 def proof_of_work(a, last_block, data):
     func = inspect.currentframe().f_back.f_code
+    logging.info("Starting proof of work")
     start = time.time()
     interval = 20
     now = time.time() + 1
@@ -131,7 +133,9 @@ def proof_of_work(a, last_block, data):
                 return False, consensus
         effort, pow_hash_object = Utility.genhash(last_block.index + 1, now, data, last_block.hash)
         leading_zeroes = Utility.leadingzeroes(pow_hash_object.digest())
-    return True, Block(last_block.index + 1, now, pow_hash_object.hexdigest(), effort, data, last_block.hash)
+    retBlock = Block(last_block.index + 1, now, pow_hash_object.hexdigest(), effort, data, last_block.hash)
+    logging.info("returning: {}".format(retBlock))
+    return True, retBlock
 
 
 def mine(a):
