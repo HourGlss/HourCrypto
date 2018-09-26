@@ -5,8 +5,7 @@ import string
 
 from ecdsa import ecdsa
 import logging
-FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
-logging.basicConfig(filename='runlog.log', level=logging.DEBUG, format=FORMAT)
+
 def buildmessage(type,data):
     return (type,data)
 def buildpow(index,timestamp,effort,data,previous_hash):
