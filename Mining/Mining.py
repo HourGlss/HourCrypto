@@ -97,20 +97,7 @@ def find_new_chains():
     return other_chains
 
 
-def create_genesis_block():
-    func = inspect.currentframe().f_back.f_code
-    logging.info("Creating a genesis block")
-    logging.debug("Work:{}".format(variables.WORK))
-    work_ez = int(variables.WORK / 4) + 1
-    pow = "0" * work_ez
-    pad = "1337"
-    for i in range(4, 64):
-        pow += pad[i % len(pad)]
-    b = Block(0, time.time(), pow, "e", [],
-              "0")
-    b.data = [{"FROM": 0, "TO": 0, "AMOUNT": 0}]
-    logging.info("Returning block: {}".format(b))
-    return b
+
 
 
 def proof_of_work(a, last_block, data):
@@ -158,7 +145,7 @@ def mine(a):
     if not blockchain:
         logging.info("Didn't receive a blockchain from anyone and need to make one")
         # We didn't find one, need to make one
-        variables.BLOCKCHAIN.append(create_genesis_block())
+        variables.BLOCKCHAIN.append(Utility.create_genesis_block())
     else:
         logging.info("Received a blockchain from the net")
         # See if we got any blocks from someone, save it
@@ -178,6 +165,7 @@ def mine(a):
         transactions = requests.get(url).content
         logging.debug("Done getting transactions")
         variables.PENDING_TRANSACTIONS = json.loads(transactions)
+        logging.warning("type of transaction: {}".format(type(variables.PENDING_TRANSACTIONS)))
         variables.PENDING_TRANSACTIONS.append({
             "from": "network",
             "to": User.public_key,

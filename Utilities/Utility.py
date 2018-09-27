@@ -2,18 +2,41 @@ import base64
 import hashlib
 import secrets
 import string
-
+import Mining.Variables as variables
+import inspect
+import time
+from Mining.Block import Block
 from ecdsa import ecdsa
 import logging
 
+def create_genesis_block():
+    func = inspect.currentframe().f_back.f_code
+    logging.info("Creating a genesis block")
+    logging.debug("Work:{}".format(variables.WORK))
+    work_ez = int(variables.WORK / 4) + 1
+    pow = "0" * work_ez
+    pad = "1337"
+    for i in range(4, 64):
+        pow += pad[i % len(pad)]
+    b = Block(0, time.time(), pow, "e", [],
+              "0")
+    b.data = [{"FROM": 0, "TO": 0, "AMOUNT": 0}]
+    logging.info("Returning block: {}".format(b))
+    return b
+
 def buildmessage(type,data):
+    func = inspect.currentframe().f_back.f_code
+
     logging.debug("type: {} data:{}".format(type,data))
     return (type,data)
 def buildpow(index,timestamp,effort,data,previous_hash):
     m = hashlib.sha256()
     m.update((str(index) + str(timestamp) + str(effort) + str(data) + str(previous_hash)).encode('utf-8'))
     return m
+
 def validate(block):
+    func = inspect.currentframe().f_back.f_code
+
     logging.info("Validating block")
     if block.index == 0:
         logging.debug("Block validated good")
@@ -54,11 +77,15 @@ def createHexdigest(s):
     return secret_key
 
 def validate_blockchain(blockchain):
+    func = inspect.currentframe().f_back.f_code
+
     logging.info("Validating blockchain")
     previous = ""
     for i in range(0,len(blockchain)-1):
         block = blockchain[i]
+        logging.debug("Evaluating block: {}".format(block))
         if block.index == 0:
+            logging.debug("Genesis block found")
             previous = block.hash
             continue
         else:
@@ -70,6 +97,7 @@ def validate_blockchain(blockchain):
             return False
         data = block.data
         for transaction in data:
+            logging.debug("trans: {}".format(transaction))
             if transaction['from'] == "network" and transaction['amount'] != 1:
                 logging.debug("data didn't validate")
                 logging.info("Did not validate blockchain")
