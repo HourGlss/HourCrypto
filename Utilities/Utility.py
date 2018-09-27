@@ -49,7 +49,7 @@ def validate(block):
     return False
 
 def random_str():
-    # Generate a random size string from 3 - 27 characters long
+    # Generate a random size string
     rand_str = ''
     for i in range(0, 1 + secrets.randbelow(25)):
         rand_str += string.ascii_lowercase[secrets.randbelow(26)]  # each char is a random downcase letter [a-z]
