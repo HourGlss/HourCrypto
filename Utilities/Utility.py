@@ -22,7 +22,7 @@ def validate(block):
     if block.proof_of_work == pow.hexdigest():
         logging.debug("Block validated good")
         return True
-    logging.debug("Block failed {}".format(block))
+    logging.warning("Block failed {}".format(block))
     return False
 
 def random_str():
@@ -65,7 +65,7 @@ def validate_blockchain(blockchain):
             previous = blockchain[i-1].hash
         if not validate(block):
             logging.debug("block didn't validate")
-            logging.info("Did not validate blockchain")
+            logging.warning("Did not validate blockchain")
 
             return False
         data = block.data
@@ -77,7 +77,7 @@ def validate_blockchain(blockchain):
                 return False
         if previous != block.previous_hash:
             logging.debug("previous hash didn't validate")
-            logging.info("Did not validate blockchain")
+            logging.warning("Did not validate blockchain")
             return False
     logging.info("Validated")
     return True
