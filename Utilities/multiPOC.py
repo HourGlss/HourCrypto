@@ -58,7 +58,6 @@ def random_str():
     return rand_str
 
 def leadingzeroes(digest):
-    #TODO I'm almost positive there's a faster way to do this
     n = 0
     result = ''.join(format(x, '08b') for x in bytearray(digest))
     for c in result:

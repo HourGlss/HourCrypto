@@ -9,6 +9,7 @@ import User.User as User
 import inspect
 import logging
 
+
 def consensus():
     func = inspect.currentframe().f_back.f_code
     logging.info("Starting Consensus")
@@ -17,7 +18,6 @@ def consensus():
     if len(peers) == 0:
         logging.info("Ending consensus, we have no peers")
         return False
-
 
     # Get the blocks from other nodes
     other_chains = find_new_chains()
@@ -108,7 +108,7 @@ def create_genesis_block():
         pow += pad[i % len(pad)]
     b = Block(0, time.time(), pow, "e", [],
               "0")
-    b.data=[{"FROM": 0,"TO":0,"AMOUNT":0}]
+    b.data = [{"FROM": 0, "TO": 0, "AMOUNT": 0}]
     logging.info("Returning block: {}".format(b))
     return b
 
@@ -131,7 +131,7 @@ def proof_of_work(a, last_block, data):
                 logging.debug("Got {} from queue".format(obj))
                 messages.append(obj)
             for message in messages:
-                if message[0] =="ip":
+                if message[0] == "ip":
                     logging.debug("That's an ip {} adding to peers".format(message[1]))
                     variables.PEER_NODES.append(str(messages[1]))
                     continue
