@@ -51,7 +51,7 @@ class Block():
         return m.hexdigest()
 
     def exportjson(self):
-        json = {
+        json_to_export = {
             "index": str(self.index),
             "timestamp": str(self.timestamp),
             "pow": str(self.proof_of_work),
@@ -60,17 +60,17 @@ class Block():
             "previous": str(self.previous_hash),
             "hash": str(self.hash)
         }
-        logging.debug("Exporting to json:{}".format(json))
-        return json
+        logging.debug("Exporting to json:{}".format(json_to_export))
+        return json_to_export
 
-    def importjson(self, json):
-        logging.debug("Importing from json:{}".format(json))
-        self.index = int(json['index'])
-        self.timestamp = float(json['timestamp'])
-        self.proof_of_work = str(json['pow'])
-        self.effort = str(json['effort'])
-        self.data = ast.literal_eval(json['data'])
-        self.previous_hash = str(json['previous'])
+    def importjson(self, json_to_import):
+        logging.debug("Importing from json:{}".format(json_to_import))
+        self.index = int(json_to_import['index'])
+        self.timestamp = str(json_to_import['timestamp'])
+        self.proof_of_work = str(json_to_import['pow'])
+        self.effort = str(json_to_import['effort'])
+        self.data = ast.literal_eval(json_to_import['data'])
+        self.previous_hash = str(json_to_import['previous'])
         self.hash = self.hash_block()
 
     def __repr__(self):

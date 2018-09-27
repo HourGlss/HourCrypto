@@ -93,7 +93,7 @@ def find_new_chains():
             else:
                 logging.warning("Blockchain did not validate")
             continue
-    logging.info("Starting to find new chains")
+    logging.info("Ending find new chains")
     return other_chains
 
 
