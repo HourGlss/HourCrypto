@@ -45,7 +45,7 @@ def validate(block):
     if block.proof_of_work == pow.hexdigest():
         logging.debug("Block validated good")
         return True
-    logging.warning("Block failed {}".format(block))
+    logging.warning("powhexdig:{} should have received: {}".format(pow.hexdigest(),block.proof_of_work))
     return False
 
 def random_str():
@@ -99,7 +99,6 @@ def validate_blockchain(blockchain):
         for transaction in data:
             logging.debug("trans: {}".format(transaction))
             if transaction['from'] == "network" and transaction['amount'] != 1:
-                logging.debug("data didn't validate")
                 logging.info("Did not validate blockchain")
 
                 return False
