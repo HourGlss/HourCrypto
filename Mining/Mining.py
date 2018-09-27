@@ -146,7 +146,7 @@ def proof_of_work(a, last_block, data):
         effort, pow_hash_object = Utility.genhash(last_block.index + 1, now, data, last_block.hash)
         leading_zeroes = Utility.leadingzeroes(pow_hash_object.digest())
     retBlock = Block(last_block.index + 1, now, pow_hash_object.hexdigest(), effort, data, last_block.hash)
-    logging.info("returning: {}".format(retBlock))
+    logging.info("Farmed a block returning: {}".format(retBlock))
     return True, retBlock
 
 
