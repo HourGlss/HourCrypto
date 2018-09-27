@@ -1,5 +1,5 @@
 import logging
-FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+FORMAT = "[{%(levelname)s} %(filename)s:%(lineno)s 	- %(funcName)20s() ] %(message)s"
 logging.basicConfig(filename='runlog.log', level=logging.DEBUG, format=FORMAT)
 import Mining.Mining as Mining
 import Web.Endpoints as Web
