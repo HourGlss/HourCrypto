@@ -13,7 +13,7 @@ def buildpow(index,timestamp,effort,data,previous_hash):
     return m
 
 def random_str():
-    # Generate a random size string from 3 - 27 characters long
+    # Generate a random size string
     rand_str = ''
     for i in range(0, 1 + secrets.randbelow(25)):
         rand_str += string.ascii_lowercase[secrets.randbelow(26)]  # each char is a random downcase letter [a-z]
@@ -42,7 +42,7 @@ def foo(a,i):
         data = {"stuff":"done"}
         effort, pow_hash_object = genhash(1, time.time(), data, "0")
         leading_zeroes = leadingzeroes(pow_hash_object.digest())
-        if leading_zeroes > 10:
+        if leading_zeroes >= 22:
             break
     if not a.empty():
         return False

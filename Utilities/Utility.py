@@ -26,9 +26,10 @@ def create_genesis_block():
 
 def buildmessage(type,data):
     func = inspect.currentframe().f_back.f_code
-
     logging.debug("type: {} data:{}".format(type,data))
     return (type,data)
+
+
 def buildpow(index,timestamp,effort,data,previous_hash):
     m = hashlib.sha256()
     m.update((str(index) + str(timestamp) + str(effort) + str(data) + str(previous_hash)).encode('utf-8'))
@@ -91,20 +92,19 @@ def validate_blockchain(blockchain):
         else:
             previous = blockchain[i-1].hash
         if not validate(block):
-            logging.debug("block didn't validate")
-            logging.warning("Did not validate blockchain")
+            logging.warning("Did not validate blockchain block did not validate")
 
             return False
         data = block.data
         for transaction in data:
             logging.debug("trans: {}".format(transaction))
             if transaction['from'] == "network" and transaction['amount'] != 1:
-                logging.info("Did not validate blockchain")
+                logging.warning("Did not validate blockchain mining wrong")
 
                 return False
         if previous != block.previous_hash:
             logging.debug("previous hash didn't validate previous:{} block.previous:{}".format(previous,block.previous_hash))
-            logging.warning("Did not validate blockchain")
+            logging.warning("Did not validate blockchain Previous hash incorrect")
             return False
     logging.info("Validated")
     return True

@@ -1,7 +1,8 @@
 import logging
 FORMAT = "[{%(levelname)s} %(filename)s:%(lineno)s 	- %(funcName)20s() ] %(message)s"
-logging.basicConfig(filename='scratch.log', level=logging.INFO, format=FORMAT)
+logging.basicConfig(filename='scratch.log', level=logging.DEBUG, format=FORMAT)
 from Mining.Block import Block
+
 import time
 import User.User as User
 import Utilities.Utility as Utility
