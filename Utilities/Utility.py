@@ -103,7 +103,7 @@ def validate_blockchain(blockchain):
 
                 return False
         if previous != block.previous_hash:
-            logging.debug("previous hash didn't validate")
+            logging.debug("previous hash didn't validate previous:{} block.previous:{}".format(previous,block.previous_hash))
             logging.warning("Did not validate blockchain")
             return False
     logging.info("Validated")
