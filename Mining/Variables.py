@@ -1,6 +1,6 @@
 import logging
 logging.info("Loading Variables")
-WORK = 5
+WORK = 18
 
 PEER_NODES = []
 MINER_NODE_URL = "127.0.0.1"

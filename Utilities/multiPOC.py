@@ -42,7 +42,7 @@ def foo(a,i):
         data = {"stuff":"done"}
         effort, pow_hash_object = genhash(1, time.time(), data, "0")
         leading_zeroes = leadingzeroes(pow_hash_object.digest())
-        if leading_zeroes >= 22:
+        if leading_zeroes >= 20:
             break
     if not a.empty():
         return False

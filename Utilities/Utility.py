@@ -14,20 +14,20 @@ def create_genesis_block():
     logging.info("Creating a genesis block")
     logging.debug("Work:{}".format(variables.WORK))
     work_ez = int(variables.WORK / 4) + 1
-    pow = "0" * work_ez
+    proof_of_work = "0" * work_ez
     pad = "1337"
     for i in range(4, 64):
-        pow += pad[i % len(pad)]
-    b = Block(0, time.time(), pow, "e", [],
+        proof_of_work += pad[i % len(pad)]
+    b = Block(0, time.time(), proof_of_work, "e", [],
               "0")
     b.data = [{"FROM": 0, "TO": 0, "AMOUNT": 0}]
     logging.info("Returning block: {}".format(b))
     return b
 
-def buildmessage(type,data):
+def buildmessage(origin, data):
     func = inspect.currentframe().f_back.f_code
-    logging.debug("type: {} data:{}".format(type,data))
-    return (type,data)
+    logging.debug("type: {} data:{}".format(origin, data))
+    return (origin, data)
 
 
 def buildpow(index,timestamp,effort,data,previous_hash):
@@ -42,12 +42,13 @@ def validate(block):
     if block.index == 0:
         logging.debug("Block validated good")
         return True
-    pow = buildpow(block.index,block.timestamp,block.effort,block.data,block.previous_hash)
-    if block.proof_of_work == pow.hexdigest():
+    generaged_proof_of_work = buildpow(block.index,block.timestamp,block.effort,block.data,block.previous_hash)
+    if block.proof_of_work == generaged_proof_of_work.hexdigest():
         logging.debug("Block validated good")
         return True
-    logging.warning("powhexdig:{} should have received: {}".format(pow.hexdigest(),block.proof_of_work))
+    logging.warning("powhexdig:{} should have received: {}".format(generaged_proof_of_work.hexdigest(),block.proof_of_work))
     return False
+
 
 def random_str():
     # Generate a random size string
