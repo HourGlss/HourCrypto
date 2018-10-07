@@ -1,6 +1,7 @@
-from anytree import Node, RenderTree, search, LevelOrderIter, PostOrderIter
+from anytree import  RenderTree, search, LevelOrderIter, PostOrderIter
 from Blockchain_classes.Block import Block
-
+import inspect
+import logging
 
 class Blockchain():
     __root = None
@@ -8,17 +9,21 @@ class Blockchain():
     __last_added = None
 
     def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
+        func = inspect.currentframe().f_back.f_code
         self.__root = Block(index, timestamp, proof_of_work_input, effort, data, previous_hash)
         self.__last_added = self.__root
 
     def add(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
+        func = inspect.currentframe().f_back.f_code
 
         found = search.find(self.__root, lambda node: node.hash == previous_hash)
         added = Block(index, timestamp, proof_of_work_input, effort, data, previous_hash, parent=found)
+
         self.__last_added = added
         self.__analyze()
 
     def __str__(self):
+        func = inspect.currentframe().f_back.f_code
         to_return = ""
         for block in self.stored:
             to_return += str(block) + "\n"
@@ -28,16 +33,18 @@ class Blockchain():
         return to_return
 
     def last_added(self):
-        return self.last_added
+        func = inspect.currentframe().f_back.f_code
+        return self.__last_added
 
     def __remove_branches(self, node, leafs):
+        func = inspect.currentframe().f_back.f_code
         branch_length = {}
         for leaf in leafs:
             done = False
             current = leaf
             steps = 0
             while not done:
-                if current.parent.name == node.name:
+                if current.parent.hash == node.previous_hash:
                     done = True
                 else:
                     steps += 1
@@ -53,7 +60,7 @@ class Blockchain():
             current = leaf
             done = False
             while not done:
-                if current.parent.name == node.name:
+                if current.parent.hash == node.previous_hash:
                     current.parent = None
                     done = True
                 else:
@@ -62,14 +69,14 @@ class Blockchain():
                     temp.parent = None
 
     def __analyze(self):
-
+        func = inspect.currentframe().f_back.f_code
         # Remove branches
         for node in PostOrderIter(self.__root):
             children = node.children
             if len(children) > 1:
                 leafs = []
                 for find_leaf in PostOrderIter(self.__root):
-                    if find_leaf.is_leaf and find_leaf.name in [n.name for n in node.descendants]:
+                    if find_leaf.is_leaf and find_leaf.hash in [n.hash for n in node.descendants]:
                         leafs.append(find_leaf)
 
                 self.__remove_branches(node, leafs)
@@ -89,7 +96,7 @@ class Blockchain():
             save_for_root = None
             while not done:
 
-                if current.parent.name == self.__root.name:
+                if current.parent.hash == self.__root.previous_hash:
                     current.parent = None
                     done = True
                 else:
@@ -110,5 +117,6 @@ class Blockchain():
                 self.stored.append(to_store[i])
 
     def __show(self):
+        func = inspect.currentframe().f_back.f_code
         for pre, fill, node in RenderTree(self.__root):
-            print("{}{}".format(pre, node.name))
+            print("{}{}".format(pre, node.hash))
