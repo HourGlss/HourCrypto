@@ -5,7 +5,6 @@ import logging
 import inspect
 
 import Utilities.Utility as Utility
-from Mining.Block import Block
 import User.User as User
 import Mining.Variables as variables
 node = Flask(__name__)

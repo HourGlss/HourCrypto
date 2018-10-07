@@ -5,7 +5,7 @@ import string
 import Mining.Variables as variables
 import inspect
 import time
-from Mining.Block import Block
+from Blockchain.Block import Block
 from ecdsa import ecdsa
 import logging
 

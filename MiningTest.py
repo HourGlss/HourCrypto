@@ -1,7 +1,7 @@
 import logging
 FORMAT = "[{%(levelname)s} %(filename)s:%(lineno)s 	- %(funcName)20s() ] %(message)s"
 logging.basicConfig(filename='scratch.log', level=logging.DEBUG, format=FORMAT)
-from Mining.Block import Block
+from Blockchain.Block import Block
 
 import time
 import User.User as User
@@ -28,3 +28,5 @@ while True:
     block = Block(last_block.index + 1, now, pow_hash_object.hexdigest(), effort, data, last_block.hash)
     BLOCKCHAIN.append(block)
 Utility.validate_blockchain(BLOCKCHAIN)
+
+

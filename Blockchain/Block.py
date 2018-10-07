@@ -4,10 +4,10 @@ import inspect
 import logging
 # The class for Block
 class Block():
-    def __init__(self, index=-1, timestamp=-1, pow=-1, effort=-1, data=-1, previous_hash=-1):
+    def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
         func = inspect.currentframe().f_back.f_code
         logging.info("Created a block i:{}".format(index))
-        logging.debug("Block i:{} time:{} pow:{} effort:{} data:{} prev_hash:{}".format(index,timestamp,pow,effort,data,previous_hash))
+        logging.debug("Block i:{} time:{} pow:{} effort:{} data:{} prev_hash:{}".format(index, timestamp, proof_of_work_input, effort, data, previous_hash))
         """Returns a new Block object. Each block is "chained" to its previous
         by calling its unique hash.
 
@@ -32,7 +32,7 @@ class Block():
         self.index = index
         self.timestamp = timestamp
 
-        self.proof_of_work = pow
+        self.proof_of_work = proof_of_work_input
         self.effort = effort
         self.data = data
         '''

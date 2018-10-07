@@ -1,7 +1,7 @@
 import requests
 import json
 import time
-from Mining.Block import Block
+from Blockchain.Block import Block
 import Mining.Variables as variables
 import Utilities.Utility as Utility
 import User.User as User
@@ -104,6 +104,8 @@ def proof_of_work(a, last_block, data):
     func = inspect.currentframe().f_back.f_code
     logging.info("Starting proof of work")
     start = time.time()
+
+    #TODO this should probably be... maybe 15 * 60
     interval = 20
     now = time.time() + 1
     effort, pow_hash_object = Utility.genhash(last_block.index + 1, time.time(), data, last_block.hash)
