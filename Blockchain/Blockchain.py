@@ -13,6 +13,7 @@ class Tree():
         found = search.find(self.root, lambda node: node.name == param)
         Node(name_to_add, parent=found)
         self.__analyze()
+
     def __remove_branches(self, node, leafs):
         branch_length = {}
         for leaf in leafs:
@@ -79,36 +80,31 @@ class Tree():
                     temp = current
                     current = current.parent
 
-
                     if hinder > 0:
-                        if hinder ==1:
+                        if hinder == 1:
                             save_for_root = current
-                        hinder -=1
+                        hinder -= 1
                     else:
                         to_store.append(current)
                         temp.parent = None
-
 
             to_store.append(self.root)
             self.root = save_for_root
             for i in range(len(to_store) - 1, -1, -1):
                 self.stored.append(to_store[i])
 
-
     def __show(self):
         for pre, fill, node in RenderTree(self.root):
             print("{}{}".format(pre, node.name))
 
 
-
-
 if __name__ == "__main__":
     tr = Tree(Node("a"))
-    tr.add('b','a')
+    tr.add('b', 'a')
     tr.add('c', 'b')
-    tr.add('d','c')
-    tr.add('e','d')
-    tr.add('f','d')
+    tr.add('d', 'c')
+    tr.add('e', 'd')
+    tr.add('f', 'd')
     tr.add('g', 'e')
     tr.add('h', 'f')
     tr.add('i', 'h')
