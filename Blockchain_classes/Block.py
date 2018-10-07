@@ -2,9 +2,11 @@ import hashlib
 import ast
 import inspect
 import logging
+from anytree import NodeMixin
 # The class for Block
-class Block():
+class BaseBlock(object):
     def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
+        print("BaseBlock", index)
         func = inspect.currentframe().f_back.f_code
         logging.info("Created a block i:{}".format(index))
         logging.debug("Block i:{} time:{} pow:{} effort:{} data:{} prev_hash:{}".format(index, timestamp, proof_of_work_input, effort, data, previous_hash))
@@ -29,6 +31,7 @@ class Block():
             hash(str): Current block unique hash.
 
         """
+
         self.index = index
         self.timestamp = timestamp
 
@@ -84,3 +87,10 @@ class Block():
                                                                                              self.effort, self.data,
                                                                                              self.previous_hash,
                                                                                              self.hash)
+
+class Block(BaseBlock,NodeMixin):
+    def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1,parent = None):
+        print("Block",index)
+        NodeMixin.__init__(self)
+        BaseBlock.__init__(self,index,timestamp,proof_of_work_input,effort,data,previous_hash)
+        self.name = self.hash

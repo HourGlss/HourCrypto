@@ -1,7 +1,7 @@
 import requests
 import json
 import time
-from Blockchain.Block import Block
+from Blockchain_classes.Block import Block
 import Mining.Variables as variables
 import Utilities.Utility as Utility
 import User.User as User
@@ -88,10 +88,10 @@ def find_new_chains():
             logging.debug("Attempting to validate this: {}".format(found_blockchain))
             validated = Utility.validate_blockchain(found_blockchain)
             if validated:
-                logging.debug("Blockchain did validate")
+                logging.debug("Blockchain_classes did validate")
                 other_chains.append(found_blockchain)
             else:
-                logging.warning("Blockchain did not validate")
+                logging.warning("Blockchain_classes did not validate")
             continue
     logging.info("Ending find new chains")
     return other_chains

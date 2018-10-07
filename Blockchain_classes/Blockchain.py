@@ -1,18 +1,34 @@
 from anytree import Node, RenderTree, search, LevelOrderIter, PostOrderIter
+from Blockchain_classes.Block import Block
 
 
-class Tree():
-    root = None
+class Blockchain():
+    __root = None
     stored = []
+    __last_added = None
 
-    def __init__(self, genesis):
-        self.root = genesis
+    def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
+        self.__root = Block(index, timestamp, proof_of_work_input, effort, data, previous_hash)
+        self.__last_added = self.__root
 
-    def add(self, name_to_add, param):
+    def add(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
 
-        found = search.find(self.root, lambda node: node.name == param)
-        Node(name_to_add, parent=found)
+        found = search.find(self.__root, lambda node: node.hash == previous_hash)
+        added = Block(index, timestamp, proof_of_work_input, effort, data, previous_hash, parent=found)
+        self.__last_added = added
         self.__analyze()
+
+    def __str__(self):
+        to_return = ""
+        for block in self.stored:
+            to_return += str(block) + "\n"
+        to_return += "\n"
+        for pre, fill, block in RenderTree(self.__root):
+            to_return += "{}{}".format(pre, block.hash)
+        return to_return
+
+    def last_added(self):
+        return self.last_added
 
     def __remove_branches(self, node, leafs):
         branch_length = {}
@@ -48,11 +64,11 @@ class Tree():
     def __analyze(self):
 
         # Remove branches
-        for node in PostOrderIter(self.root):
+        for node in PostOrderIter(self.__root):
             children = node.children
             if len(children) > 1:
                 leafs = []
-                for find_leaf in PostOrderIter(self.root):
+                for find_leaf in PostOrderIter(self.__root):
                     if find_leaf.is_leaf and find_leaf.name in [n.name for n in node.descendants]:
                         leafs.append(find_leaf)
 
@@ -60,7 +76,7 @@ class Tree():
         # Store Verified
         starting = 0
         end = None
-        for node in LevelOrderIter(self.root):
+        for node in LevelOrderIter(self.__root):
             if len(node.children) > 1:
                 break
             end = node
@@ -73,7 +89,7 @@ class Tree():
             save_for_root = None
             while not done:
 
-                if current.parent.name == self.root.name:
+                if current.parent.name == self.__root.name:
                     current.parent = None
                     done = True
                 else:
@@ -88,41 +104,11 @@ class Tree():
                         to_store.append(current)
                         temp.parent = None
 
-            to_store.append(self.root)
-            self.root = save_for_root
+            to_store.append(self.__root)
+            self.__root = save_for_root
             for i in range(len(to_store) - 1, -1, -1):
                 self.stored.append(to_store[i])
 
     def __show(self):
-        for pre, fill, node in RenderTree(self.root):
+        for pre, fill, node in RenderTree(self.__root):
             print("{}{}".format(pre, node.name))
-
-
-if __name__ == "__main__":
-    tr = Tree(Node("a"))
-    tr.add('b', 'a')
-    tr.add('c', 'b')
-    tr.add('d', 'c')
-    tr.add('e', 'd')
-    tr.add('f', 'd')
-    tr.add('g', 'e')
-    tr.add('h', 'f')
-    tr.add('i', 'h')
-    tr.add('j', 'i')
-    tr.add('k', 'j')
-    tr.add('m', 'b')
-    tr.add('n', 'm')
-    tr.add("l", "k")
-    tr.add('o', 'l')
-    tr.add('p', 'o')
-    tr.add('q', 'p')
-    tr.add('r', 'q')
-    tr.add('s', 'r')
-    tr.add('t', 's')
-    tr.add('u', 't')
-    tr.add('v', 'u')
-    tr.add('w', 'v')
-    tr.add('x', 'w')
-    tr.add('y', 'x')
-    tr.add('z', 'y')
-    print(tr.stored)

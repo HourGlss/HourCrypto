@@ -5,7 +5,7 @@ import string
 import Mining.Variables as variables
 import inspect
 import time
-from Blockchain.Block import Block
+from Blockchain_classes.Block import Block
 from ecdsa import ecdsa
 import logging
 
@@ -18,8 +18,7 @@ def create_genesis_block():
     pad = "1337"
     for i in range(4, 64):
         proof_of_work += pad[i % len(pad)]
-    b = Block(0, time.time(), proof_of_work, "e", [],
-              "0")
+    b = Block(0, time.time(), proof_of_work, "e", [],"0")
     b.data = [{"FROM": 0, "TO": 0, "AMOUNT": 0}]
     logging.info("Returning block: {}".format(b))
     return b
