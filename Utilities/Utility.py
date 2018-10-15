@@ -11,8 +11,8 @@ import logging
 
 def create_genesis_block():
     func = inspect.currentframe().f_back.f_code
-    logging.info("Creating a genesis block")
-    logging.debug("Work:{}".format(variables.WORK))
+    # logging.info("Creating a genesis block")
+    # logging.debug("Work:{}".format(variables.WORK))
     work_ez = int(variables.WORK / 4) + 1
     proof_of_work = "0" * work_ez
     pad = "1337"
@@ -20,7 +20,7 @@ def create_genesis_block():
         proof_of_work += pad[i % len(pad)]
     b = Block(0, time.time(), proof_of_work, "e", [],"0")
     b.data = [{"FROM": 0, "TO": 0, "AMOUNT": 0}]
-    logging.info("Returning block: {}".format(b))
+    # logging.info("Returning block: {}".format(b))
     return b
 
 def buildmessage(origin, data):

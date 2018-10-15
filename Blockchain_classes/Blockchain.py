@@ -10,26 +10,36 @@ class Blockchain():
 
     def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
         func = inspect.currentframe().f_back.f_code
-        self.__root = Block(index, timestamp, proof_of_work_input, effort, data, previous_hash)
+        block = Block(index, timestamp, proof_of_work_input, effort, data, previous_hash)
+        logging.debug("Block added {}".format(str(block)))
+        self.__root = block
         self.__last_added = self.__root
 
     def add(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
         func = inspect.currentframe().f_back.f_code
-
+        logging.debug("Looking for {}".format(previous_hash))
         found = search.find(self.__root, lambda node: node.hash == previous_hash)
-        added = Block(index, timestamp, proof_of_work_input, effort, data, previous_hash, parent=found)
+        if found != None:
+            block = Block(index, timestamp, proof_of_work_input, effort, data, previous_hash, parent=found)
+            logging.debug("Adding {} with parent {}".format(block.hash,found.hash))
+            added = block
 
-        self.__last_added = added
-        self.__analyze()
+            self.__last_added = added
+            self.__analyze()
+        else:
+            print("Couldn't find the block")
 
     def __str__(self):
         func = inspect.currentframe().f_back.f_code
-        to_return = ""
+        to_return = "stored\n"
+        i = 0
         for block in self.stored:
-            to_return += str(block) + "\n"
-        to_return += "\n"
+            to_return += str(i)+" "+str(block) + "\n"
+            i+=1
+        to_return += "\ntree\n"
         for pre, fill, block in RenderTree(self.__root):
-            to_return += "{}{}".format(pre, block.hash)
+            to_return += "{}{} {}\n".format(pre, i,block)
+            i+=1
         return to_return
 
     def last_added(self):
@@ -44,7 +54,7 @@ class Blockchain():
             current = leaf
             steps = 0
             while not done:
-                if current.parent.hash == node.previous_hash:
+                if current.parent.hash == node.hash:
                     done = True
                 else:
                     steps += 1
@@ -60,7 +70,7 @@ class Blockchain():
             current = leaf
             done = False
             while not done:
-                if current.parent.hash == node.previous_hash:
+                if current.parent.hash == node.hash:
                     current.parent = None
                     done = True
                 else:
@@ -96,7 +106,7 @@ class Blockchain():
             save_for_root = None
             while not done:
 
-                if current.parent.hash == self.__root.previous_hash:
+                if current.parent.hash == self.__root.hash:
                     current.parent = None
                     done = True
                 else:
