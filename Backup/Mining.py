@@ -140,7 +140,7 @@ def mine(a, blockchain, node_pending_transactions):
     global WORK
     NODE_PENDING_TRANSACTIONS = node_pending_transactions
     while True:
-        """Mining is the only way that new coins can be created.
+        """Mining_classes is the only way that new coins can be created.
         In order to prevent too many coins to be created, the process
         is slowed down by a proof of work algorithm.
         """

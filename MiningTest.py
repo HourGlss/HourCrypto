@@ -4,14 +4,27 @@ logging.basicConfig(filename='scratch.log', level=logging.DEBUG, format=FORMAT)
 from Blockchain_classes.Block import Block
 from Blockchain_classes.Blockchain import Blockchain
 import time
-import User.User as User
+import sqlite3
+import User_classes.User as User
 import Utilities.Utility as Utility
-
-WORK = 3
+conn = sqlite3.connect('blockchain.db')
+c = conn.cursor()
+WORK = 8
 genesis = Utility.create_genesis_block()
-blockchain = Blockchain(genesis.index,genesis.timestamp,genesis.proof_of_work,genesis.effort,genesis.data,genesis.previous_hash)
+blockchain = Blockchain(genesis.index,genesis.timemade,genesis.proof_of_work,genesis.effort,genesis.transactions,genesis.previous_hash)
 added = 0
-while added < 100:
+
+
+
+def save(block):
+    c.execute("INSERT INTO blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:previous_hash,:hash)",block.getdict())
+
+    conn.commit()
+
+
+c.execute("DELETE FROM blocks")
+conn.commit()
+while added < 1000:
     last_block = blockchain.last_added()
 
     now = time.time()
@@ -28,5 +41,9 @@ while added < 100:
             done = True
     added +=1
     blockchain.add(last_block.index + 1, now, pow_hash_object.hexdigest(), effort, data, last_block.hash)
+    need_to_save,to_store = blockchain.to_store()
+    if need_to_save:
+        for block in to_store:
+            save(block)
 print(str(blockchain))
 

@@ -5,8 +5,17 @@ import logging
 
 class Blockchain():
     __root = None
-    stored = []
+    __stored = []
     __last_added = None
+
+    def to_store(self):
+        if len(self.__stored) > 0:
+            tosend = []
+            for block in self.__stored:
+                tosend.append(block)
+            self.__stored = []
+            return (True,tosend)
+        return (False,0)
 
     def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
         func = inspect.currentframe().f_back.f_code
@@ -33,7 +42,7 @@ class Blockchain():
         func = inspect.currentframe().f_back.f_code
         to_return = "stored\n"
         i = 0
-        for block in self.stored:
+        for block in self.__stored:
             to_return += str(i)+" "+str(block) + "\n"
             i+=1
         to_return += "\ntree\n"
@@ -124,7 +133,7 @@ class Blockchain():
             to_store.append(self.__root)
             self.__root = save_for_root
             for i in range(len(to_store) - 1, -1, -1):
-                self.stored.append(to_store[i])
+                self.__stored.append(to_store[i])
 
     def __show(self):
         func = inspect.currentframe().f_back.f_code

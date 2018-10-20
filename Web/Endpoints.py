@@ -5,8 +5,8 @@ import logging
 import inspect
 
 import Utilities.Utility as Utility
-import User.User as User
-import Mining.Variables as variables
+import User_classes.User as User
+import Mining_classes.Variables as variables
 node = Flask(__name__)
 q = None
 def start(a):

@@ -2,9 +2,9 @@ import requests
 import json
 import time
 from Blockchain_classes.Block import Block
-import Mining.Variables as variables
+import Mining_classes.Variables as variables
 import Utilities.Utility as Utility
-import User.User as User
+import User_classes.User as User
 
 import inspect
 import logging

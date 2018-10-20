@@ -2,12 +2,15 @@ import hashlib
 import ast
 import inspect
 import logging
+import pickle
+
 from anytree import NodeMixin
 
 
 # The class for Block
 class BaseBlock(object):
-    def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
+
+    def __init__(self, index=-1, time=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
         # func = inspect.currentframe().f_back.f_code
 
         # logging.debug(
@@ -40,18 +43,18 @@ class BaseBlock(object):
     def hash_block(self):
         """Creates the unique hash for the block. It uses sha256."""
         m = hashlib.sha256()
-        m.update((str(self.index) + str(self.timestamp) + str(self.proof_of_work) + str(self.effort) + str(
-            self.data) + str(self.previous_hash)).encode('utf-8'))
+        m.update((str(self.index) + str(self.timemade) + str(self.proof_of_work) + str(self.effort) + str(
+            self.transactions) + str(self.previous_hash)).encode('utf-8'))
         # logging.debug("Block's hash: {}".format(m.hexdigest()))
         return m.hexdigest()
 
     def exportjson(self):
         json_to_export = {
             "index": str(self.index),
-            "timestamp": str(self.timestamp),
+            "timestamp": str(self.timemade),
             "pow": str(self.proof_of_work),
             "effort": str(self.effort),
-            "data": str(self.data),
+            "data": str(self.transactions),
             "previous": str(self.previous_hash),
             "hash": str(self.hash)
         }
@@ -61,17 +64,22 @@ class BaseBlock(object):
     def importjson(self, json_to_import):
         # logging.debug("Importing from json:{}".format(json_to_import))
         self.index = int(json_to_import['index'])
-        self.timestamp = str(json_to_import['timestamp'])
+        self.timemade = str(json_to_import['timestamp'])
         self.proof_of_work = str(json_to_import['pow'])
         self.effort = str(json_to_import['effort'])
-        self.data = ast.literal_eval(json_to_import['data'])
+        self.transactions = ast.literal_eval(json_to_import['data'])
         self.previous_hash = str(json_to_import['previous'])
         self.hash = self.hash_block()
 
+    def getdict(self):
+        gen_dict = {'index': self.index, 'timemade': self.timemade, 'proof_of_work': self.proof_of_work,
+                    'effort': self.effort, 'transactions': pickle.dumps(self.transactions),
+                    'previous_hash': self.previous_hash, 'hash': self.hash}
+        return gen_dict
     def __repr__(self):
         # def __init__(self, index, timestamp, pow, effort,data, previous_hash):
-        return "Block({},{},'{}','{}',{},'{}')".format(self.index, self.timestamp, self.proof_of_work, self.effort,
-                                                       self.data, self.previous_hash)
+        return "Block({},{},'{}','{}',{},'{}')".format(self.index, self.timemade, self.proof_of_work, self.effort,
+                                                       self.transactions, self.previous_hash)
 
     def __str__(self):
         return "hash: {} previous: {}".format(self.hash, self.previous_hash)
@@ -85,18 +93,20 @@ class BaseBlock(object):
                                                                                              self.hash)
     '''
 
-
 class Block(BaseBlock, NodeMixin):
     def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1,
                  parent=None):
+        __tablename__ = "blocks"
         super(BaseBlock, self).__init__()
         self.parent = parent
         self.index = index
-        self.timestamp = timestamp
+        self.timemade = timestamp
+
 
         self.proof_of_work = proof_of_work_input
         self.effort = effort
-        self.data = data
+        self.transactions = data
+
         '''
         data contains:
          transactions: list
