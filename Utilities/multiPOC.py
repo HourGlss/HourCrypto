@@ -5,33 +5,7 @@ import string
 import secrets
 import time
 import os
-
-
-def buildpow(index,timestamp,effort,data,previous_hash):
-    m = hashlib.sha256()
-    m.update((str(index) + str(timestamp) + str(effort) + str(data) + str(previous_hash)).encode('utf-8'))
-    return m
-
-def random_str():
-    # Generate a random size string
-    rand_str = ''
-    for i in range(0, 1 + secrets.randbelow(25)):
-        rand_str += string.ascii_lowercase[secrets.randbelow(26)]  # each char is a random downcase letter [a-z]
-    return rand_str
-
-def leadingzeroes(digest):
-    n = 0
-    result = ''.join(format(x, '08b') for x in bytearray(digest))
-    for c in result:
-        if c == '0':
-            n += 1
-        else:
-            break
-    return n
-
-def genhash(index,timestamp,data,last_hash):
-    effort = random_str()
-    return effort, buildpow(index,timestamp,effort,data,last_hash)
+from Utilities import Utility
 
 
 def foo(a,i):
@@ -40,8 +14,8 @@ def foo(a,i):
     effort = None
     while a.empty():
         data = {"stuff":"done"}
-        effort, pow_hash_object = genhash(1, time.time(), data, "0")
-        leading_zeroes = leadingzeroes(pow_hash_object.digest())
+        effort, pow_hash_object = Utility.genhash(1, time.time(), data, "0")
+        leading_zeroes = Utility.leadingzeroes(pow_hash_object.digest())
         if leading_zeroes >= 20:
             break
     if not a.empty():

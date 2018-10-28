@@ -9,7 +9,7 @@ import User_classes.User as User
 import Utilities.Utility as Utility
 conn = sqlite3.connect('blockchain.db')
 c = conn.cursor()
-WORK = 8
+WORK = 9
 genesis = Utility.create_genesis_block()
 blockchain = Blockchain(genesis.index,genesis.timemade,genesis.proof_of_work,genesis.effort,genesis.transactions,genesis.previous_hash)
 added = 0
@@ -24,7 +24,7 @@ def save(block):
 
 c.execute("DELETE FROM blocks")
 conn.commit()
-while added < 1000:
+while added < 100:
     last_block = blockchain.last_added()
 
     now = time.time()
