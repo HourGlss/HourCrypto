@@ -8,10 +8,7 @@ import Utilities.Utility as Utility
 import User_classes.User as User
 import Mining_classes.Variables as variables
 node = Flask(__name__)
-q = None
 def start(a):
-    global q
-    q = a
     global node
     node.config['SECRET_KEY'] = Utility.createHexdigest(User.password)
     node.run(host="0.0.0.0", port=variables.PORT)

@@ -106,40 +106,21 @@ def proof_of_work(a, last_block, data):
     start = time.time()
 
     #TODO this should probably be... maybe 15 * 60
-    interval = 20
+    interval = 5*60
     now = time.time() + 1
     effort, pow_hash_object = Utility.genhash(last_block.index + 1, time.time(), data, last_block.hash)
     leading_zeroes = Utility.leadingzeroes(pow_hash_object.digest())
     while leading_zeroes <= variables.WORK:
         now = time.time() + 1
         if int(now - start) % interval + 1 == 0:
-            logging.debug("Checking for messages")
-            messages = []
-            while not a.empty():
-                obj = a.get()
-                logging.debug("Got {} from queue".format(obj))
-                messages.append(obj)
-            for message in messages:
-                if message[0] == "ip":
-                    logging.debug("That's an ip {} adding to peers".format(message[1]))
-                    variables.PEER_NODES.append(str(messages[1]))
-                    continue
-                logging.debug("not an IP, putting it back message:{}".format(message))
-                a.put(message)
             start = time.time()
             consensus = consensus()
-
             if consensus:
                 logging.info("Received a consensus while doing POW")
                 return False, consensus
         effort, pow_hash_object = Utility.genhash(last_block.index + 1, now, data, last_block.hash)
         leading_zeroes = Utility.leadingzeroes(pow_hash_object.digest())
     retBlock = Block(last_block.index + 1, now, pow_hash_object.hexdigest(), effort, data, last_block.hash)
-    # xml = """<?xml version='1.0' encoding='utf-8'?>
-    # <a>б</a>"""
-    # headers = {'Content-Type': 'application/xml'} # set what your server accepts
-    # print(requests.post('http://httpbin.org/post', data=xml, headers=headers).text)
-    # tree = et.parse('scratch.xml')
     logging.info("Farmed a block returning: {}".format(retBlock))
     return True, retBlock
 
@@ -157,9 +138,6 @@ def mine(a):
         logging.info("Received a blockchain from the net")
         # See if we got any blocks from someone, save it
         variables.BLOCKCHAIN = blockchain
-    message = Utility.buildmessage("blockchain", variables.BLOCKCHAIN)
-    logging.debug("Adding {} to queue".format(message))
-    a.put(message)
     url = "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/blocks?update=" + User.public_key
     logging.debug("accessing url via GET")
     requests.get(url)
