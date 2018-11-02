@@ -20,48 +20,6 @@ def start(a):
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-@node.route('/blocks', methods=['GET','POST'])
-def get_blocks():
-    func = inspect.currentframe().f_back.f_code
-    ip = request.remote_addr
-    logging.info("/blocks accessed from {} via {}".format(ip,request.method))
-    if request.method == 'POST':
-        if str(ip) != "127.0.0.1" and ip not in variables.PEER_NODES:
-            logging.debug("We didn't know that IP, adding it to Q")
-            message  = Utility.buildmessage("ip",ip)
-            logging.debug("message: {}".format(message))
-            q.put(message)
-    # Load current blockchain. Only you should update your blockchain
-    qfrom = "other"
-    if request.args.get("update") == User.public_key:
-        logging.debug("update was from our public, we updated our blockchain")
-        qget= q.get()
-        logging.debug("qget is {}".format(qget))
-        qfrom = qget[0]
-        variables.BLOCKCHAIN = qget[1]
-        logging.info("Done updating our blockchain")
-
-        return "200"
-    else:
-        chain_to_send = variables.BLOCKCHAIN
-        logging.debug("Chain to send:{}".format(chain_to_send))
-        logging.debug("request was not from us, we need to give them our blockchain")
-        # Converts our blocks into dictionaries so we can send them as json objects later
-        chain_to_send_json = []
-        for block in chain_to_send:
-            logging.debug("block to send TYPE:{} details:{}".format(type(block),block))
-            try:
-                chain_to_send_json.append(block.exportjson())
-            except AttributeError:
-                logging.error("This is not a block {}".format(block))
-
-        # Send our chain to whomever requested it
-        chain_to_send = json.dumps(chain_to_send_json)
-        logging.debug("Sending {}".format(chain_to_send))
-        logging.info("Done sending out our blockchain")
-        return chain_to_send
-
-
 @node.route('/txion', methods=['GET', 'POST'])
 def transaction():
     func = inspect.currentframe().f_back.f_code
@@ -98,6 +56,21 @@ def transaction():
         variables.PENDING_TRANSACTIONS = []
         return pending
 
+
+@node.route('/block', methods=['GET','POST'])
+def block():
+    ip = request.remote_addr
+
+    if request.method == 'POST':
+        try:
+            print(ip,request.data.decode('utf-8'))
+        except TypeError:
+            print("data error")
+    else:
+        block_number = str(int(request.args['block_number']))
+        print(ip, block_number)
+
+    return "0\n"
 
 @node.route('/balances', methods=['GET'])
 def get_balance():
