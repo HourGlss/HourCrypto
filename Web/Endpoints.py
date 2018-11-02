@@ -3,15 +3,18 @@ import json
 import requests
 import logging
 import inspect
-
+from Blockchain_classes.Blockchain import Blockchain
 import Utilities.Utility as Utility
 import User_classes.User as User
 import Mining_classes.Variables as variables
 node = Flask(__name__)
-def start(a):
-    global node
+def start():
+    global node,blockchain
     node.config['SECRET_KEY'] = Utility.createHexdigest(User.password)
     node.run(host="0.0.0.0", port=variables.PORT)
+    genesis = Utility.create_genesis_block()
+    blockchain = Blockchain(genesis.index, genesis.timemade, genesis.proof_of_work, genesis.effort,
+                            genesis.transactions, genesis.previous_hash)
 
 
 
