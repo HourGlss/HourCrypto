@@ -135,6 +135,11 @@ def proof_of_work(a, last_block, data):
         effort, pow_hash_object = Utility.genhash(last_block.index + 1, now, data, last_block.hash)
         leading_zeroes = Utility.leadingzeroes(pow_hash_object.digest())
     retBlock = Block(last_block.index + 1, now, pow_hash_object.hexdigest(), effort, data, last_block.hash)
+    # xml = """<?xml version='1.0' encoding='utf-8'?>
+    # <a>б</a>"""
+    # headers = {'Content-Type': 'application/xml'} # set what your server accepts
+    # print(requests.post('http://httpbin.org/post', data=xml, headers=headers).text)
+    # tree = et.parse('scratch.xml')
     logging.info("Farmed a block returning: {}".format(retBlock))
     return True, retBlock
 

@@ -48,7 +48,6 @@ class Block(object):
                 if type(value) is type({}):
 
                     self.transactions.append(value)
-
             except:
                 pass
 

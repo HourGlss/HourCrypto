@@ -1,4 +1,5 @@
 import hashlib
+import xmltodict
 import ast
 import inspect
 import logging
@@ -10,36 +11,9 @@ from anytree import NodeMixin
 # The class for Block
 class BaseBlock(object):
 
-    def __init__(self, index=-1, time=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
-        # func = inspect.currentframe().f_back.f_code
-
-        # logging.debug(
-        #     "Block i:{} time:{} pow:{} effort:{} data:{} prev_hash:{}".format(index, timestamp, proof_of_work_input,
-        #                                                                       effort, data, previous_hash))
-        """Returns a new Block object. Each block is "chained" to its previous
-        by calling its unique hash.
-
-        Args:
-            index (int): Block number.
-            timestamp (float): Block creation timestamp.
-            pow (str): Proof of work sha256 hexdigest, should start with a certain number of zeroes
-            effort (str): random string that is used to pad the index, timestamp, pow, and previous block hash so that
-                there is enough leading zeroes in the sha256 digest
-            data (list): Transactional Data to be sent.
-            previous_hash(str): String representing previous block unique hash.
-
-
-        Attrib:
-            index (int): Block number.
-            timestamp (int): Block creation timestamp.
-            data (dict): Data to be sent.
-            previous_hash(str): String representing previous block unique hash.
-            hash(str): Current block unique hash.
-
-        """
-
-
+    def __init__(self, index=-1, time=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1):
         logging.info("Created a block:{}".format(str(self)))
+
     def hash_block(self):
         """Creates the unique hash for the block. It uses sha256."""
         m = hashlib.sha256()
@@ -48,38 +22,70 @@ class BaseBlock(object):
         # logging.debug("Block's hash: {}".format(m.hexdigest()))
         return m.hexdigest()
 
-    def exportjson(self):
-        json_to_export = {
-            "index": str(self.index),
-            "timestamp": str(self.timemade),
-            "pow": str(self.proof_of_work),
-            "effort": str(self.effort),
-            "data": str(self.transactions),
-            "previous": str(self.previous_hash),
-            "hash": str(self.hash)
-        }
-        # logging.debug("Exporting to json:{}".format(json_to_export))
-        return json_to_export
+    def importXml(self, block_xml):
+        for field in block_xml:
+            if field != "transactions":
+                self.setField(field, block_xml[field])
+            else:
+                for transaction in block_xml[field]['trans']:
+                    transaction_to_add = {}
+                    for k in transaction:
+                        transaction_to_add[k] = transaction[k]
+                    self.setField("transaction", transaction_to_add)
 
-    def importjson(self, json_to_import):
-        # logging.debug("Importing from json:{}".format(json_to_import))
-        self.index = int(json_to_import['index'])
-        self.timemade = str(json_to_import['timestamp'])
-        self.proof_of_work = str(json_to_import['pow'])
-        self.effort = str(json_to_import['effort'])
-        self.transactions = ast.literal_eval(json_to_import['data'])
-        self.previous_hash = str(json_to_import['previous'])
-        self.hash = self.hash_block()
+    def setField(self,field,value):
+        #index=-1, time=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1
+        if field == 'index':
+            try:
+                self.index = int(value)
+            except:
+                pass
+        elif field == 'time':
+            try:
+                self.time = float(value)
+            except:
+                pass
+        elif field == 'proof_of_work':
+            try:
+                self.proof_of_work = str(value)
+            except:
+                pass
+        elif field == 'effort':
+            try:
+                self.effort = str(value)
+            except:
+                pass
+        elif field == 'previous_hash':
+            try:
+                self.previous_hash = str(value)
+            except:
+                pass
+        elif field == 'transaction':
+            try:
+                if type(value) is type({}):
+
+                    self.transactions.append(value)
+            except:
+                pass
+
+    def exportXml(self):
+        # index=-1, time=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1
+        block = {'block':{'index':self.index,'time':self.time,'proof_of_work':self.proof_of_work,'effort':self.effort,'transactions':{'trans':self.transactions}},'previous_hash':self.previous_hash}
+        return xmltodict.unparse(block)
 
     def getdict(self):
         gen_dict = {'index': self.index, 'timemade': self.timemade, 'proof_of_work': self.proof_of_work,
                     'effort': self.effort, 'transactions': pickle.dumps(self.transactions),
                     'previous_hash': self.previous_hash, 'hash': self.hash}
         return gen_dict
+
+
     def __repr__(self):
         # def __init__(self, index, timestamp, pow, effort,data, previous_hash):
         return "Block({},{},'{}','{}',{},'{}')".format(self.index, self.timemade, self.proof_of_work, self.effort,
                                                        self.transactions, self.previous_hash)
+
+
 
     def __str__(self):
         return "hash: {} previous: {}".format(self.hash, self.previous_hash)
@@ -94,7 +100,7 @@ class BaseBlock(object):
     '''
 
 class Block(BaseBlock, NodeMixin):
-    def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1,
+    def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1,
                  parent=None):
         __tablename__ = "blocks"
         super(BaseBlock, self).__init__()
@@ -105,7 +111,7 @@ class Block(BaseBlock, NodeMixin):
 
         self.proof_of_work = proof_of_work_input
         self.effort = effort
-        self.transactions = data
+        self.transactions = transactions
 
         '''
         data contains:
