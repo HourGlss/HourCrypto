@@ -11,90 +11,13 @@ import logging
 
 
 def consensus():
-    func = inspect.currentframe().f_back.f_code
-    logging.info("Starting Consensus")
-    peers = variables.PEER_NODES
-    logging.debug("Peers: {}".format(peers))
-    if len(peers) == 0:
-        logging.info("Ending consensus, we have no peers")
-        return False
-
-    # Get the blocks from other nodes
-    other_chains = find_new_chains()
-    if len(other_chains) == 0:
-        logging.debug("no chains found")
-        logging.info("Ending consensus, no other chains found")
-        return False
-    if type(other_chains[0]) != type([]):
-        if len(other_chains) < len(variables.BLOCKCHAIN):
-            logging.debug("Our blockchain is bigger")
-            logging.info("Ending consensus, rejecting others")
-            return False
-        else:
-            logging.info("Ending consensus, we have one peer with a longer blockchain")
-
-            return other_chains
-    # If our chain isn't longest, then we store the longest chain
-    longest = 0
-    max_length = 0
-    for i in range(len(other_chains)):
-        if Utility.validate_blockchain(other_chains[i]):
-            chain_length = len(other_chains[i])
-            if chain_length > max_length:
-                max_length = chain_length
-                longest = i
-    if len(other_chains[longest]) == len(variables.BLOCKCHAIN):
-        logging.debug("Our blockchain is the same size1")
-        logging.info("Ending consensus, rejecting others")
-        return False
-    logging.info("Ending Consensus with a chain")
-    logging.debug("Consensus returned: {}".format(other_chains[longest]))
-    return other_chains[longest]
+    #TODO Remake consensus, possible shift into endpoints
+    pass
 
 
 def find_new_chains():
-    func = inspect.currentframe().f_back.f_code
-    logging.info("Starting to find new chains")
-    # Get the blockchains of every other node
-    peers = variables.PEER_NODES
-    logging.debug("peers: {}".format(len(peers)))
-    other_chains = []
-    for node_url in peers:
-
-        blockchain_json = None
-        found_blockchain = []
-
-        url = "http://" + node_url + ":" + str(variables.PORT) + "/blocks"
-        try:
-            logging.debug("Attempting to access {}".format(node_url))
-            blockchain_json = requests.post(url)
-        except:
-            logging.warning("Failed to access {}, removing from peers".format(node_url))
-            variables.PEER_NODES.remove(node_url)
-            continue
-        # Convert the JSON object to a Python dictionary
-        if blockchain_json is not None:
-            blockchain_json = json.loads(blockchain_json.content)
-            for block_json in blockchain_json:
-                temp = Block()
-                temp.importjson(block_json)
-                if Utility.validate(temp):
-                    logging.debug("Block validated, adding")
-                    found_blockchain.append(temp)
-                else:
-                    logging.warning("Block NOT valid, next peer")
-                    continue
-            # Verify other node block is correct
-            logging.debug("Attempting to validate this: {}".format(found_blockchain))
-            validated = Utility.validate_blockchain(found_blockchain)
-            if validated:
-                logging.debug("Blockchain_classes did validate")
-                other_chains.append(found_blockchain)
-            else:
-                logging.warning("Blockchain_classes did not validate")
-            continue
-    logging.info("Ending find new chains")
-    return other_chains
+    #TODO Remake find_new_chains using restructure
+    pass
 
 
 
