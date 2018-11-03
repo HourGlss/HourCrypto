@@ -18,8 +18,8 @@ import sqlite3
 
 conn = sqlite3.connect('blockchain.db')
 c = conn.cursor()
-c.execute("DELETE FROM verified_blocks")
-c.execute("DELETE FROM unverified_blocks")
+# c.execute("DELETE FROM verified_blocks")
+# c.execute("DELETE FROM unverified_blocks")
 
 conn.commit()
 blockchain = Blockchain(genesis.index,genesis.timemade,genesis.proof_of_work,genesis.effort,genesis.transactions,genesis.previous_hash)

@@ -4,17 +4,18 @@ import requests
 import logging
 import inspect
 from Blockchain_classes.Blockchain import Blockchain
+from Blockchain_classes.Block import Block
 import Utilities.Utility as Utility
 import User_classes.User as User
 import Mining_classes.Variables as variables
+blockchain = None
 node = Flask(__name__)
 def start():
     global node,blockchain
+    blockchain = Blockchain()
     node.config['SECRET_KEY'] = Utility.createHexdigest(User.password)
     node.run(host="0.0.0.0", port=variables.PORT)
-    genesis = Utility.create_genesis_block()
-    blockchain = Blockchain(genesis.index, genesis.timemade, genesis.proof_of_work, genesis.effort,
-                            genesis.transactions, genesis.previous_hash)
+
 
 
 
@@ -22,6 +23,12 @@ def start():
 
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
+
+@node.route('/lastblock', methods=['GET','POST'])
+def lastblock():
+    global blockchain
+    block = blockchain.last_added()
+    return block.exportXml()
 
 @node.route('/txion', methods=['GET', 'POST'])
 def transaction():
@@ -59,6 +66,10 @@ def transaction():
         variables.PENDING_TRANSACTIONS = []
         return pending
 
+
+@node.route('/test', methods=['GET','POST'])
+def test():
+    return "0\n"
 
 @node.route('/block', methods=['GET','POST'])
 def block():

@@ -15,13 +15,12 @@ if __name__ == '__main__':
 
     logging.debug("Display welcome")
     welcome_msg()
-    logging.debug("Make a Q")
     p2 = Process(target=Web.start)
     logging.debug("Starting the web")
     p2.start()
     logging.debug("Web started")
 
-    p1 = Process(target=Mining.mine)
-    logging.debug("Starting to mine")
-    p1.start()
-    logging.debug("Mining_classes Started")
+    # p1 = Process(target=Mining.mine)
+    # logging.debug("Starting to mine")
+    # p1.start()
+    # logging.debug("Mining_classes Started")

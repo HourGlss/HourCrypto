@@ -26,29 +26,42 @@ class Blockchain():
                 self.connection.commit()
             self.__stored = []
 
-    def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
+    def __init__(self, index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
         func = inspect.currentframe().f_back.f_code
         self.connection = sqlite3.connect('blockchain.db')
         self.cursor = self.connection.cursor()
         self.connection.commit()
-        self.add(index, timestamp, proof_of_work_input, effort, data, previous_hash)
+        self.cursor.execute("SELECT hash FROM verified_blocks WHERE `index`=0")
+        response = self.cursor.fetchone()
+        if  len(str(response[0]))!= 64:
+            self.add(index, timemade, proof_of_work_input, effort, data, previous_hash)
+        else:
+            self.cursor.execute("SELECT * FROM unverified_blocks")
+            all = self.cursor.fetchall()
+            for db_block_info in all:
+                b = Block()
+                b.import_from_db(db_block_info)
+                self.add(b.index,b.timemade,b.proof_of_work,b.effort,b.transactions,b.previous_hash,update_db=False)
 
-    def add(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1):
+
+
+
+    def add(self,index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1,update_db = True):
         func = inspect.currentframe().f_back.f_code
         execute_sql = False
         if self.__root is None:
-            block = Block(index, timestamp, proof_of_work_input, effort, transactions, previous_hash)
+            block = Block(index, timemade, proof_of_work_input, effort, transactions, previous_hash)
             execute_sql = True
             self.__root = block
             self.__last_added = self.__root
         found = search.find(self.__root, lambda node: node.hash == previous_hash)
         if found != None:
-            block = Block(index, timestamp, proof_of_work_input, effort, transactions, previous_hash, parent=found)
+            block = Block(index, timemade, proof_of_work_input, effort, transactions, previous_hash, parent=found)
             added = block
             execute_sql = True
             self.__last_added = added
             self.__analyze()
-        if execute_sql:
+        if execute_sql and update_db:
             logging.debug("Block added {} into unverified ".format(block.hash))
             self.cursor.execute(
                 "INSERT INTO unverified_blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:previous_hash,:hash)",
@@ -74,6 +87,7 @@ class Blockchain():
     def last_added(self):
         func = inspect.currentframe().f_back.f_code
         return self.__last_added
+
 
     def __remove_branches(self, node, leafs):
         func = inspect.currentframe().f_back.f_code

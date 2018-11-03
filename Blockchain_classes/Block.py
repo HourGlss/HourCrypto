@@ -25,6 +25,7 @@ class BaseBlock(object):
     def importXml(self, block_xml):
         for field in block_xml:
             if field != "transactions":
+
                 self.setField(field, block_xml[field])
             else:
                 for transaction in block_xml[field]['trans']:
@@ -70,8 +71,8 @@ class BaseBlock(object):
 
     def exportXml(self):
         # index=-1, time=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1
-        block = {'block':{'index':self.index,'time':self.time,'proof_of_work':self.proof_of_work,'effort':self.effort,'transactions':{'trans':self.transactions}},'previous_hash':self.previous_hash}
-        return xmltodict.unparse(block)
+        returnblock = {'block':{'index':self.index,'time':self.timemade,'proof_of_work':self.proof_of_work,'effort':self.effort,'transactions':{'trans':self.transactions},'previous_hash':self.previous_hash}}
+        return xmltodict.unparse(returnblock)
 
     def getdict(self):
         gen_dict = {'index': self.index, 'timemade': self.timemade, 'proof_of_work': self.proof_of_work,
@@ -79,9 +80,17 @@ class BaseBlock(object):
                     'previous_hash': self.previous_hash, 'hash': self.hash}
         return gen_dict
 
+    def import_from_db(self,listinfo):
+        self.index = int(listinfo[0])
+        self.timemade = float(listinfo[1])
+        self.proof_of_work = str(listinfo[2])
+        self.effort = str(listinfo[3])
+        self.transactions = pickle.loads(listinfo[4])
+        self.previous_hash = str(listinfo[5])
+        self.hash = str(listinfo[6])
 
     def __repr__(self):
-        # def __init__(self, index, timestamp, pow, effort,data, previous_hash):
+        # def __init__(self, index, timemade, pow, effort,data, previous_hash):
         return "Block({},{},'{}','{}',{},'{}')".format(self.index, self.timemade, self.proof_of_work, self.effort,
                                                        self.transactions, self.previous_hash)
 
@@ -92,7 +101,7 @@ class BaseBlock(object):
 
     '''
     def __str__(self):
-        return "i: {} time: {} \tpow: {} effort: {} data: {} \tprevious: {} hash: {}".format(self.index, self.timestamp,
+        return "i: {} time: {} \tpow: {} effort: {} data: {} \tprevious: {} hash: {}".format(self.index, self.timemade,
                                                                                              self.proof_of_work,
                                                                                              self.effort, self.data,
                                                                                              self.previous_hash,
@@ -100,13 +109,13 @@ class BaseBlock(object):
     '''
 
 class Block(BaseBlock, NodeMixin):
-    def __init__(self, index=-1, timestamp=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1,
+    def __init__(self, index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1,
                  parent=None):
         __tablename__ = "blocks"
         super(BaseBlock, self).__init__()
         self.parent = parent
         self.index = index
-        self.timemade = timestamp
+        self.timemade = timemade
 
 
         self.proof_of_work = proof_of_work_input
@@ -121,10 +130,11 @@ class Block(BaseBlock, NodeMixin):
         self.hash = self.hash_block()
         # NodeMixin.__init__(self)
         #
-        # BaseBlock.__init__(self, index, timestamp, proof_of_work_input, effort, data, previous_hash)
+        # BaseBlock.__init__(self, index, timemade, proof_of_work_input, effort, data, previous_hash)
         # self.name = self.hash
         # if parent != None:
         #     self.parent(parent)
 
     def getBlock(self):
         return super
+

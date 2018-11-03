@@ -28,7 +28,6 @@ def proof_of_work(a, last_block, data):
     logging.info("Starting proof of work")
     start = time.time()
 
-    #TODO this should probably be... maybe 15 * 60
     interval = 5*60
     now = time.time() + 1
     effort, pow_hash_object = Utility.genhash(last_block.index + 1, time.time(), data, last_block.hash)
@@ -48,24 +47,14 @@ def proof_of_work(a, last_block, data):
     return True, retBlock
 
 
-def mine(a):
+def mine():
     func = inspect.currentframe().f_back.f_code
     logging.info("Starting to mine")
     # See if other blockchains exist
-    blockchain = consensus()
-    if not blockchain:
-        logging.info("Didn't receive a blockchain from anyone and need to make one")
-        # We didn't find one, need to make one
-        variables.BLOCKCHAIN.append(Utility.create_genesis_block())
-    else:
-        logging.info("Received a blockchain from the net")
-        # See if we got any blocks from someone, save it
-        variables.BLOCKCHAIN = blockchain
-    url = "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/blocks?update=" + User.public_key
-    logging.debug("accessing url via GET")
-    requests.get(url)
-    logging.debug("Done accessing url")
+    #TODO add consensus back
     while True:
+        url = "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/lastblock"
+        last_block_xml = requests.post(url)
         last_block = variables.BLOCKCHAIN[len(variables.BLOCKCHAIN) - 1]
         #   -get transactions
         url = "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/txion?update=" + User.public_key
