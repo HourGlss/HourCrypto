@@ -20,7 +20,7 @@ class Blockchain():
         self.connection = sqlite3.connect('blockchain.db')
         self.cursor = self.connection.cursor()
         self.connection.commit()
-        self.cursor.execute("SELECT hash FROM verified_blocks WHERE `index`=0")
+        self.cursor.execute("SELECT hash FROM unverified_blocks WHERE `index`=0")
         response = self.cursor.fetchone()
         if  response == None or len(str(response[0]))!= 64:
             self.add(index, timemade, proof_of_work_input, effort, transactions, previous_hash)
@@ -38,25 +38,26 @@ class Blockchain():
     def add(self,index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1,update_db = True):
         print("adding",index)
         func = inspect.currentframe().f_back.f_code
+        block = Block(index, timemade, proof_of_work_input, effort, transactions, previous_hash)
         execute_sql = False
         if self.__root is None:
-            block = Block(index, timemade, proof_of_work_input, effort, transactions, previous_hash)
             execute_sql = True
             self.__root = block
-            self.__last_added = self.__root
         else:
+            print("root is NOT None")
             found = search.find(self.__root, lambda node: node.hash == previous_hash)
             if found != None:
-                block = Block(index, timemade, proof_of_work_input, effort, transactions, previous_hash, parent=found)
-                added = block
+                print("Found last block")
+                block.parent=found
                 execute_sql = True
-                self.__last_added = added
                 self.__analyze()
+        self.__set_last_added(block)
         if execute_sql and update_db:
-            logging.debug("Block added {} into unverified ".format(block.hash))
+            print("Block added {} into unverified ".format(block.hash))
+            dict_to_use = block.getdict()
             self.cursor.execute(
-                "INSERT INTO unverified_blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:previous_hash,:hash)",
-                block.getdict())
+                "INSERT INTO unverified_blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:hash,:previous_hash)",
+                dict_to_use)
             self.connection.commit()
             self.__added_to_db += 1
         self.__to_store()
@@ -73,6 +74,10 @@ class Blockchain():
             to_return += "{}{} {}\n".format(pre, i,block)
             i+=1
         return to_return
+
+    def __set_last_added(self,block):
+        self.__last_added = block
+        print("set",block.index,"as last block")
 
     def last_added(self):
         func = inspect.currentframe().f_back.f_code
@@ -121,7 +126,7 @@ class Blockchain():
                 self.connection.commit()
                 logging.debug("Adding {} to verified".format(block.hash))
                 self.cursor.execute(
-                    "INSERT INTO verified_blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:previous_hash,:hash)",
+                    "INSERT INTO verified_blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:hash,:previous_hash)",
                     block.getdict())
                 self.connection.commit()
             self.__stored = []
