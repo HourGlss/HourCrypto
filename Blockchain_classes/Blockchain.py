@@ -11,30 +11,19 @@ class Blockchain():
     __root = None
     __stored = []
     __last_added = None
-    added_to_db = 0
+    __added_to_db = 0
 
-    def __to_store(self):
-        if len(self.__stored) > 0:
-            for block in self.__stored:
-                logging.debug("Deleting {} from unverified".format(block.hash))
-                self.cursor.execute('DELETE FROM unverified_blocks WHERE hash=:hash',{'hash':block.hash})
-                self.connection.commit()
-                logging.debug("Adding {} to verified".format(block.hash))
-                self.cursor.execute(
-                    "INSERT INTO verified_blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:previous_hash,:hash)",
-                    block.getdict())
-                self.connection.commit()
-            self.__stored = []
 
-    def __init__(self, index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1):
+
+    def __init__(self, index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1):
         func = inspect.currentframe().f_back.f_code
         self.connection = sqlite3.connect('blockchain.db')
         self.cursor = self.connection.cursor()
         self.connection.commit()
         self.cursor.execute("SELECT hash FROM verified_blocks WHERE `index`=0")
         response = self.cursor.fetchone()
-        if  len(str(response[0]))!= 64:
-            self.add(index, timemade, proof_of_work_input, effort, data, previous_hash)
+        if  response == None or len(str(response[0]))!= 64:
+            self.add(index, timemade, proof_of_work_input, effort, transactions, previous_hash)
         else:
             self.cursor.execute("SELECT * FROM unverified_blocks")
             all = self.cursor.fetchall()
@@ -47,6 +36,7 @@ class Blockchain():
 
 
     def add(self,index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1,update_db = True):
+        print("adding",index)
         func = inspect.currentframe().f_back.f_code
         execute_sql = False
         if self.__root is None:
@@ -54,25 +44,25 @@ class Blockchain():
             execute_sql = True
             self.__root = block
             self.__last_added = self.__root
-        found = search.find(self.__root, lambda node: node.hash == previous_hash)
-        if found != None:
-            block = Block(index, timemade, proof_of_work_input, effort, transactions, previous_hash, parent=found)
-            added = block
-            execute_sql = True
-            self.__last_added = added
-            self.__analyze()
+        else:
+            found = search.find(self.__root, lambda node: node.hash == previous_hash)
+            if found != None:
+                block = Block(index, timemade, proof_of_work_input, effort, transactions, previous_hash, parent=found)
+                added = block
+                execute_sql = True
+                self.__last_added = added
+                self.__analyze()
         if execute_sql and update_db:
             logging.debug("Block added {} into unverified ".format(block.hash))
             self.cursor.execute(
                 "INSERT INTO unverified_blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:previous_hash,:hash)",
                 block.getdict())
             self.connection.commit()
-            self.added_to_db += 1
+            self.__added_to_db += 1
         self.__to_store()
 
     def __str__(self):
         func = inspect.currentframe().f_back.f_code
-        print("added",self.added_to_db)
         to_return = "stored\n"
         i = 0
         for block in self.__stored:
@@ -88,6 +78,8 @@ class Blockchain():
         func = inspect.currentframe().f_back.f_code
         return self.__last_added
 
+    def num_added(self):
+        return self.__added_to_db
 
     def __remove_branches(self, node, leafs):
         func = inspect.currentframe().f_back.f_code
@@ -120,6 +112,19 @@ class Blockchain():
                     temp = current
                     current = current.parent
                     temp.parent = None
+
+    def __to_store(self):
+        if len(self.__stored) > 0:
+            for block in self.__stored:
+                logging.debug("Deleting {} from unverified".format(block.hash))
+                self.cursor.execute('DELETE FROM unverified_blocks WHERE hash=:hash',{'hash':block.hash})
+                self.connection.commit()
+                logging.debug("Adding {} to verified".format(block.hash))
+                self.cursor.execute(
+                    "INSERT INTO verified_blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:previous_hash,:hash)",
+                    block.getdict())
+                self.connection.commit()
+            self.__stored = []
 
     def __analyze(self):
         func = inspect.currentframe().f_back.f_code

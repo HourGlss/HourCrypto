@@ -2,6 +2,7 @@ from flask import Flask, request
 import json
 import requests
 import logging
+import xmltodict
 import inspect
 from Blockchain_classes.Blockchain import Blockchain
 from Blockchain_classes.Block import Block
@@ -12,7 +13,8 @@ blockchain = None
 node = Flask(__name__)
 def start():
     global node,blockchain
-    blockchain = Blockchain()
+    genesis = Utility.create_genesis_block()
+    blockchain = Blockchain(genesis.index,genesis.timemade,genesis.proof_of_work,genesis.effort,genesis.transactions,genesis.previous_hash)
     node.config['SECRET_KEY'] = Utility.createHexdigest(User.password)
     node.run(host="0.0.0.0", port=variables.PORT)
 
@@ -29,6 +31,11 @@ def lastblock():
     global blockchain
     block = blockchain.last_added()
     return block.exportXml()
+
+@node.route('/numblocks', methods=['POST'])
+def numblocks():
+    global blockchain
+    return blockchain.num_added()
 
 @node.route('/txion', methods=['GET', 'POST'])
 def transaction():
@@ -66,6 +73,14 @@ def transaction():
         variables.PENDING_TRANSACTIONS = []
         return pending
 
+# def consensus():
+#     #TODO Remake consensus, possible shift into endpoints
+#     pass
+# 
+# 
+# def find_new_chains():
+#     #TODO Remake find_new_chains using restructure
+#     pass
 
 @node.route('/test', methods=['GET','POST'])
 def test():
@@ -73,13 +88,16 @@ def test():
 
 @node.route('/block', methods=['GET','POST'])
 def block():
+    global blockchain
     ip = request.remote_addr
-
     if request.method == 'POST':
-        try:
-            print(ip,request.data.decode('utf-8'))
-        except TypeError:
-            print("data error")
+
+        raw = request.data.decode('utf-8')
+        parsed = xmltodict.parse(raw)
+        b = Block()
+        b.importXml(parsed['block'])
+        blockchain.add(b.index,b.timemade,b.proof_of_work,b.effort,b.transactions,b.previous_hash)
+
     else:
         block_number = str(int(request.args['block_number']))
         print(ip, block_number)
@@ -90,7 +108,7 @@ def block():
 def get_balance():
     func = inspect.currentframe().f_back.f_code
     ip = request.remote_addr
-    logging.info("{} looked at balances".format(ip))
+    #logging.info("{} looked at balances".format(ip))
     working = variables.BLOCKCHAIN
     balances = {}
     balances_json = []
