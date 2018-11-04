@@ -11,7 +11,7 @@ from anytree import NodeMixin
 # The class for Block
 class BaseBlock(object):
 
-    def __init__(self, index=-1, time=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1):
+    def __init__(self, index=-1, time=-1, proof_of_work_input=-1, effort=-1, transactions=[], previous_hash=-1):
         logging.info("Created a block:{}".format(str(self)))
 
     def hash_block(self):
@@ -25,14 +25,12 @@ class BaseBlock(object):
     def importXml(self, block_xml):
         for field in block_xml:
             if field != "transactions":
-
                 self.setField(field, block_xml[field])
             else:
+                transaction_to_add = {}
                 for transaction in block_xml[field]['trans']:
-                    transaction_to_add = {}
-                    for k in transaction:
-                        transaction_to_add[k] = transaction[k]
-                    self.setField("transaction", transaction_to_add)
+                    transaction_to_add[transaction]=block_xml[field]['trans'][transaction]
+                self.setField("transaction", transaction_to_add)
 
     def setField(self,field,value):
         #index=-1, time=-1, proof_of_work_input=-1, effort=-1, data=-1, previous_hash=-1
@@ -41,9 +39,9 @@ class BaseBlock(object):
                 self.index = int(value)
             except:
                 pass
-        elif field == 'time':
+        elif field == 'timemade':
             try:
-                self.time = float(value)
+                self.timemade = float(value)
             except:
                 pass
         elif field == 'proof_of_work':
@@ -71,7 +69,7 @@ class BaseBlock(object):
 
     def exportXml(self):
         # index=-1, time=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1
-        returnblock = {'block':{'index':self.index,'time':self.timemade,'proof_of_work':self.proof_of_work,'effort':self.effort,'transactions':{'trans':self.transactions},'previous_hash':self.previous_hash}}
+        returnblock = {'block':{'index':self.index,'timemade':self.timemade,'proof_of_work':self.proof_of_work,'effort':self.effort,'transactions':{'trans':self.transactions},'previous_hash':self.previous_hash}}
         return xmltodict.unparse(returnblock)
 
     def getdict(self):
@@ -109,7 +107,7 @@ class BaseBlock(object):
     '''
 
 class Block(BaseBlock, NodeMixin):
-    def __init__(self, index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1,
+    def __init__(self, index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=[], previous_hash=-1,
                  parent=None):
         __tablename__ = "blocks"
         super(BaseBlock, self).__init__()
