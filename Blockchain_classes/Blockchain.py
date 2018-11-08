@@ -12,14 +12,20 @@ class Blockchain():
     __stored = []
     __last_added = None
     __added_to_db = 0
+    __delete_db = True
 
-
+    def __check_delete(self):
+        if self.__delete_db:
+            self.cursor.execute("DELETE FROM verified_blocks")
+            self.cursor.execute("DELETE FROM unverified_blocks")
+            self.connection.commit()
 
     def __init__(self, index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1):
         func = inspect.currentframe().f_back.f_code
         self.connection = sqlite3.connect('blockchain.db')
         self.cursor = self.connection.cursor()
         self.connection.commit()
+        self.__check_delete()
         self.cursor.execute("SELECT hash FROM unverified_blocks WHERE `index`=0")
         response = self.cursor.fetchone()
         if  response == None or len(str(response[0]))!= 64:
@@ -36,7 +42,6 @@ class Blockchain():
 
 
     def add(self,index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1,update_db = True):
-        print("adding",index)
         func = inspect.currentframe().f_back.f_code
         block = Block(index, timemade, proof_of_work_input, effort, transactions, previous_hash)
         execute_sql = False
@@ -44,16 +49,13 @@ class Blockchain():
             execute_sql = True
             self.__root = block
         else:
-            print("root is NOT None")
             found = search.find(self.__root, lambda node: node.hash == previous_hash)
             if found != None:
-                print("Found last block")
                 block.parent=found
                 execute_sql = True
                 self.__analyze()
         self.__set_last_added(block)
         if execute_sql and update_db:
-            print("Block added {} into unverified ".format(block.hash))
             dict_to_use = block.getdict()
             self.cursor.execute(
                 "INSERT INTO unverified_blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:hash,:previous_hash)",
@@ -77,7 +79,6 @@ class Blockchain():
 
     def __set_last_added(self,block):
         self.__last_added = block
-        print("set",block.index,"as last block")
 
     def last_added(self):
         func = inspect.currentframe().f_back.f_code

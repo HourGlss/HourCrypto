@@ -5,6 +5,7 @@ from Blockchain_classes.Block import Block
 import Mining_classes.Variables as variables
 import Utilities.Utility as Utility
 import User_classes.User as User
+import sys
 
 import inspect
 import logging
@@ -29,11 +30,12 @@ def mine():
     logging.info("Starting to mine")
     # See if other blockchains exist
     #TODO add consensus back
-    while True:
+    i = 0
+    while i < 10:
         url = "http://" + variables.MINER_NODE_URL + ":" + str(variables.PORT) + "/lastblock"
         last_block_xml = requests.post(url)
-        raw = last_block_xml.content.decode('utf-8')
         parsed = xmltodict.parse(last_block_xml.content)
+        print(last_block_xml.content.decode('utf-8'))
         last_block = Block()
         last_block.importXml(parsed['block'])
         transactions = {"from":"network","to":User.public_key,"amount":1}
@@ -42,3 +44,5 @@ def mine():
         xml = pow_output.exportXml()
         headers = {'Content-Type': 'application/xml'}
         requests.post(url, data=xml, headers=headers).text
+        sys.exit()
+        i+=1

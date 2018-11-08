@@ -18,8 +18,10 @@ def create_genesis_block():
     pad = "1337"
     for i in range(4, 64):
         proof_of_work += pad[i % len(pad)]
+    while len(proof_of_work) <64:
+        proof_of_work += "1"
     b = Block(0, time.time(), proof_of_work, "e", [],"0")
-    b.transactions = [{"from": 0, "to": 0, "amount": 0}]
+    b.transactions = [{"from": '0', "to": '0', "amount": '0'}]
     # logging.info("Returning block: {}".format(b))
     return b
 
