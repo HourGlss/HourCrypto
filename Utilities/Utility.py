@@ -37,6 +37,7 @@ def buildpow(index,timestamp,effort,data,previous_hash):
     return m
 
 def validate(block):
+
     func = inspect.currentframe().f_back.f_code
 
     logging.info("Validating block")
