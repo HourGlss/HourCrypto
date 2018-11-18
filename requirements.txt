@@ -1,3 +1,5 @@
+anytree
+xmltodict
 Flask
 ecdsa
 requests

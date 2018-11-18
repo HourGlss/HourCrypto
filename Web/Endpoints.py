@@ -31,7 +31,7 @@ log.setLevel(logging.ERROR)
 def lastblock():
     global blockchain
     block = blockchain.last_added()
-    return block.exportXml()
+    return block.export_to_xml()
 
 
 @node.route('/numblocks', methods=['POST'])
@@ -47,11 +47,11 @@ def block():
     if request.method == 'POST':
 
         raw = request.data.decode('utf-8')
-        print(raw)
         parsed = xmltodict.parse(raw)
         b = Block()
-        b.importXml(parsed['block'])
+        b.import_from_xml(parsed['block'])
         blockchain.add(b.index, b.timemade, b.proof_of_work, b.effort, b.transactions, b.previous_hash)
+        b = None
     else:
         block_number = str(int(request.args['block_number']))
 

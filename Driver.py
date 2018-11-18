@@ -21,8 +21,7 @@ if __name__ == '__main__':
     p2.start()
     logging.debug("Web started")
 
-    time.sleep(5)
+    time.sleep(10)
     p1 = Process(target=Mining.mine)
-    logging.debug("Starting to mine")
     p1.start()
     logging.debug("Mining_classes Started")

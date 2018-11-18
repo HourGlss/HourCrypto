@@ -22,7 +22,7 @@ class Blockchain():
 
     def __init__(self, index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1):
         func = inspect.currentframe().f_back.f_code
-        self.connection = sqlite3.connect('blockchain.db')
+        self.connection = sqlite3.connect('blockchain.db', check_same_thread=False)
         self.cursor = self.connection.cursor()
         self.connection.commit()
         self.__check_delete()
@@ -35,7 +35,7 @@ class Blockchain():
             all = self.cursor.fetchall()
             for db_block_info in all:
                 b = Block()
-                b.import_from_db(db_block_info)
+                b.import_from_database(db_block_info)
                 self.add(b.index,b.timemade,b.proof_of_work,b.effort,b.transactions,b.previous_hash,update_db=False)
 
 
@@ -56,7 +56,7 @@ class Blockchain():
                 self.__analyze()
         self.__set_last_added(block)
         if execute_sql and update_db:
-            dict_to_use = block.getdict()
+            dict_to_use = block.get_block_as_dictionary()
             self.cursor.execute(
                 "INSERT INTO unverified_blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:hash,:previous_hash)",
                 dict_to_use)
@@ -124,11 +124,10 @@ class Blockchain():
             for block in self.__stored:
                 logging.debug("Deleting {} from unverified".format(block.hash))
                 self.cursor.execute('DELETE FROM unverified_blocks WHERE hash=:hash',{'hash':block.hash})
-                self.connection.commit()
                 logging.debug("Adding {} to verified".format(block.hash))
                 self.cursor.execute(
                     "INSERT INTO verified_blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:hash,:previous_hash)",
-                    block.getdict())
+                    block.get_block_as_dictionary())
                 self.connection.commit()
             self.__stored = []
 
