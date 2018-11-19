@@ -119,9 +119,8 @@ class BaseBlock(object):
 
 
 class Block(BaseBlock, NodeMixin):
-    def __init__(self, index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=[], previous_hash=-1,
+    def __init__(self, index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=None, previous_hash=-1,
                  parent=None):
-        __tablename__ = "blocks"
         super(BaseBlock, self).__init__()
         self.parent = parent
         self.index = int(index)
@@ -129,7 +128,10 @@ class Block(BaseBlock, NodeMixin):
 
         self.proof_of_work = str(proof_of_work_input)
         self.effort = str(effort)
-        self.transactions = transactions
+        if transactions is None:
+            self.transactions = []
+        else:
+            self.transactions = transactions
 
         '''
         data contains:

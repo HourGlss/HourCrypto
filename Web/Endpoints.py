@@ -27,11 +27,7 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 
-@node.route('/lastblock', methods=['GET', 'POST'])
-def lastblock():
-    global blockchain
-    block = blockchain.last_added()
-    return block.export_to_xml()
+
 
 
 @node.route('/numblocks', methods=['POST'])
@@ -39,6 +35,11 @@ def numblocks():
     global blockchain
     return blockchain.num_added()
 
+@node.route('/lastblock', methods=['GET', 'POST'])
+def lastblock():
+    global blockchain
+    block = blockchain.last_added()
+    return block.export_to_xml()
 
 @node.route('/block', methods=['GET', 'POST'])
 def block():

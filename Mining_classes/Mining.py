@@ -40,9 +40,10 @@ def mine():
         parsed = xmltodict.parse(last_block_xml.content)
         last_block = Block()
         last_block.import_from_xml(parsed['block'])
-        transactions = {"from": "network", "to": User.public_key, "amount": 1}
+        transactions = [{"from": "network", "to": User.public_key, "amount": 1}]
         # TODO get REAL transactions from transaction db
         pow_output = proof_of_work(last_block, transactions)
+        transactions = [{}]
         url = "http://" + Variables.MINER_NODE_URL + ":" + str(Variables.PORT) + "/block"
         xml = pow_output.export_to_xml()
         headers = {'Content-Type': 'application/xml'}

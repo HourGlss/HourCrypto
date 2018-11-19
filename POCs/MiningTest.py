@@ -12,15 +12,7 @@ WORK = 9
 genesis = Utility.create_genesis_block()
 
 added = 0
-import sqlite3
 
-
-
-conn = sqlite3.connect('blockchain.db')
-c = conn.cursor()
-
-
-conn.commit()
 blockchain = Blockchain(genesis.index,genesis.timemade,genesis.proof_of_work,genesis.effort,genesis.transactions,genesis.previous_hash)
 while added < 100:
     last_block = blockchain.last_added()
