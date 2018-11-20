@@ -19,9 +19,6 @@ class BaseBlock(object):
         m.update((str(self.index) + str(self.timemade) + str(self.proof_of_work) + str(self.effort) + str(
             self.transactions) + str(self.previous_hash)).encode('utf-8'))
         return_hash = m.hexdigest()
-        if int(self.index) != -1:
-            logging.debug(
-                "i:{} hash:{} prev:{} trans:{}".format(self.index, return_hash, self.previous_hash, self.transactions))
         return return_hash
 
     def import_from_xml(self, block_xml):

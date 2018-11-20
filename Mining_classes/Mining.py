@@ -13,7 +13,6 @@ import logging
 def proof_of_work(last_block, data):
     func = inspect.currentframe().f_back.f_code
     index_to_use = last_block.index + 1
-    logging.info("Starting proof of work")
     done = False
     now = None
     pow_hash_object = None
