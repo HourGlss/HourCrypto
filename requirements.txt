@@ -3,4 +3,3 @@ xmltodict
 Flask
 ecdsa
 requests
-flask-sqlalchemy

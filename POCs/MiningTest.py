@@ -1,7 +1,6 @@
 import logging
 FORMAT = "[{%(levelname)s} %(filename)s:%(lineno)s 	- %(funcName)20s() ] %(message)s"
 logging.basicConfig(filename='scratch.log', level=logging.DEBUG, format=FORMAT)
-from Blockchain_classes.Block import Block
 from Blockchain_classes.Blockchain import Blockchain
 import time
 
