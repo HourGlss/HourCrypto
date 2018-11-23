@@ -3,6 +3,7 @@ from Blockchain_classes.Block import Block
 import inspect
 import logging
 import sqlite3
+import sys
 
 
 
@@ -12,7 +13,7 @@ class Blockchain():
     __stored = []
     __last_added = None
     __added_to_db = 0
-    __delete_db = True
+    __delete_db = False
 
     def __check_delete(self):
         if self.__delete_db:
@@ -20,40 +21,51 @@ class Blockchain():
             self.cursor.execute("DELETE FROM unverified_blocks")
             self.connection.commit()
 
-    def __init__(self, index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1):
+    def __init__(self, block):
         func = inspect.currentframe().f_back.f_code
         self.connection = sqlite3.connect('blockchain.db', check_same_thread=False)
         self.cursor = self.connection.cursor()
         self.connection.commit()
         self.__check_delete()
         self.cursor.execute("SELECT hash FROM unverified_blocks WHERE `index`=0")
-        response = self.cursor.fetchone()
-        if  response == None or len(str(response[0]))!= 64:
-            self.add(index, timemade, proof_of_work_input, effort, transactions, previous_hash)
+        unverified_response = self.cursor.fetchone()
+        self.cursor.execute("SELECT hash FROM verified_blocks WHERE `index`=0")
+        verified_response = self.cursor.fetchone()
+        if  unverified_response is None and verified_response is None:
+            self.add(block)
         else:
             self.cursor.execute("SELECT * FROM unverified_blocks")
+
             all = self.cursor.fetchall()
             for db_block_info in all:
                 b = Block()
                 b.import_from_database(db_block_info)
-                self.add(b.index,b.timemade,b.proof_of_work,b.effort,b.transactions,b.previous_hash,update_db=False)
+                self.add(b,update_db=False)
+            print("Done reloading")
 
 
 
 
-    def add(self,index=-1, timemade=-1, proof_of_work_input=-1, effort=-1, transactions=-1, previous_hash=-1,update_db = True):
+
+
+
+
+    def add(self,block,update_db = True):
         func = inspect.currentframe().f_back.f_code
-        block = Block(index, timemade, proof_of_work_input, effort, transactions, previous_hash)
         execute_sql = False
         if self.__root is None:
             execute_sql = True
             self.__root = block
         else:
-            found = search.find(self.__root, lambda node: node.hash == previous_hash)
+            # print("trying to add {}".format(block))
+            found = search.find(self.__root, lambda node: node.hash == block.previous_hash)
             if found != None:
                 block.parent=found
                 execute_sql = True
                 self.__analyze()
+            else:
+                print("MAJOR PROBLEM couldn't find parent")
+
         self.__set_last_added(block)
         if execute_sql and update_db:
             dict_to_use = block.get_block_as_dictionary()

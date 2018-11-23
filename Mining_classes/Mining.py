@@ -24,16 +24,15 @@ def proof_of_work(last_block, data):
         if leading_zeroes >= Variables.WORK:
             done = True
     return_block = Block(index_to_use, now, pow_hash_object.hexdigest(), effort, data, last_block.hash)
-    print("farmed a block")
     return return_block
 
 
 def mine():
     func = inspect.currentframe().f_back.f_code
-    logging.info("Starting to mine")
     # See if other blockchains exist
     # TODO add consensus back
-    while True:
+    i = 0
+    while i < 100:
         url = "http://" + Variables.MINER_NODE_URL + ":" + str(Variables.PORT) + "/lastblock"
         last_block_xml = requests.post(url)
         parsed = xmltodict.parse(last_block_xml.content)
@@ -47,3 +46,5 @@ def mine():
         xml = pow_output.export_to_xml()
         headers = {'Content-Type': 'application/xml'}
         resp = requests.post(url, data=xml, headers=headers).text
+        i+=1
+    print("done")

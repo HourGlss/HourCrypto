@@ -8,7 +8,7 @@ from Blockchain_classes.Blockchain import Blockchain
 from Blockchain_classes.Block import Block
 import Utilities.Utility as Utility
 import User_classes.User as User
-import Mining_classes.Variables as variables
+import Mining_classes.Variables as Variables
 
 blockchain = None
 node = Flask(__name__)
@@ -16,11 +16,11 @@ node = Flask(__name__)
 
 def start():
     global node, blockchain
-    genesis = Utility.create_genesis_block()
-    blockchain = Blockchain(genesis.index, genesis.timemade, genesis.proof_of_work, genesis.effort,
-                            genesis.transactions, genesis.previous_hash)
+    if not len(Variables.PEER_NODES) > 0:
+        genesis = Utility.create_genesis_block()
+        blockchain = Blockchain(genesis)
     node.config['SECRET_KEY'] = Utility.createHexdigest(User.password)
-    node.run(host="0.0.0.0", port=variables.PORT)
+    node.run(host="0.0.0.0", port=Variables.PORT)
 
 
 log = logging.getLogger('werkzeug')
@@ -30,10 +30,10 @@ log.setLevel(logging.ERROR)
 
 
 
-@node.route('/numblocks', methods=['POST'])
+@node.route('/numblocks', methods=['GET','POST'])
 def numblocks():
     global blockchain
-    return blockchain.num_added()
+    return str(blockchain.num_added())
 
 @node.route('/lastblock', methods=['GET', 'POST'])
 def lastblock():
@@ -51,7 +51,7 @@ def block():
         parsed = xmltodict.parse(raw)
         b = Block()
         b.import_from_xml(parsed['block'])
-        blockchain.add(b.index, b.timemade, b.proof_of_work, b.effort, b.transactions, b.previous_hash)
+        blockchain.add(b)
         b = None
     else:
         block_number = str(int(request.args['block_number']))

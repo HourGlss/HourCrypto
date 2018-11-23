@@ -90,20 +90,22 @@ class BaseBlock(object):
 
     def import_from_database(self, listinfo):
         self.index = int(listinfo[0])
-        self.timemade = float(listinfo[1])
+        self.timemade = str(listinfo[1])
         self.proof_of_work = str(listinfo[2])
         self.effort = str(listinfo[3])
         self.transactions = pickle.loads(listinfo[4])
-        self.previous_hash = str(listinfo[5])
+        self.previous_hash = str(listinfo[6])
         self.hash = self.hash_block()
+
 
     def __repr__(self):
         # def __init__(self, index, timemade, pow, effort,data, previous_hash):
-        return "Block({},{},'{}','{}',{},'{}','{}')".format(self.index, self.timemade, self.proof_of_work, self.effort,
-                                                            self.transactions, self.previous_hash, self.hash)
+        return "i:{},time:{},proof:{},effort:{},hash:{},previous:{})".format(self.index, self.timemade, self.proof_of_work, self.effort,
+                                                             self.hash,self.previous_hash)
 
     def __str__(self):
-        return "hash: {} previous: {}".format(self.hash, self.previous_hash)
+        return repr(self)
+        # return "hash: {} previous: {}".format(self.hash, self.previous_hash)
 
     '''
     def __str__(self):
@@ -121,7 +123,9 @@ class Block(BaseBlock, NodeMixin):
         super(BaseBlock, self).__init__()
         self.parent = parent
         self.index = int(index)
-        self.timemade = float(timemade)
+        timemade = round(float(timemade),3)
+
+        self.timemade = str(timemade)
 
         self.proof_of_work = str(proof_of_work_input)
         self.effort = str(effort)
