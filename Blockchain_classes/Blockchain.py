@@ -36,11 +36,17 @@ class Blockchain():
         else:
             self.cursor.execute("SELECT * FROM unverified_blocks")
 
-            all = self.cursor.fetchall()
-            for db_block_info in all:
+            unverified_all = self.cursor.fetchall()
+            for db_block_info in unverified_all:
                 b = Block()
                 b.import_from_database(db_block_info)
                 self.add(b,update_db=False)
+            self.cursor.execute("SELECT * FROM verified_blocks")
+            verified_all = self.cursor.fetchall()
+            if verified_all is not None:
+                self.__added_to_db+=len(verified_all)
+                self.__added_to_db += len(unverified_all)
+                print("total of {}".format(self.__added_to_db))
             print("Done reloading")
 
 
