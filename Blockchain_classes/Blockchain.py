@@ -13,7 +13,7 @@ class Blockchain():
     __stored = []
     __last_added = None
     __added_to_db = 0
-    __delete_db = False
+    __delete_db = True
 
     def __check_delete(self):
         if self.__delete_db:
@@ -52,19 +52,15 @@ class Blockchain():
     def get(self,number):
         self.cursor.execute("SELECT * FROM verified_blocks WHERE `index` = ?", (number,))
         verified_response = self.cursor.fetchone()
-        print("v",verified_response)
         if verified_response is not None:
             b = Block()
             b.import_from_database(verified_response)
-            print("v",b)
             return b
         self.cursor.execute("SELECT * FROM unverified_blocks WHERE `index` = ?", (number,))
         unverified_response = self.cursor.fetchone()
-        print("u",unverified_response)
         if unverified_response is not None:
             b = Block()
             b.import_from_database(unverified_response)
-            print("u", b)
             return b
 
     def add(self,block,update_db = True):

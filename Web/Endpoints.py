@@ -15,6 +15,7 @@ node = Flask(__name__)
 
 
 def consensus():
+    global blockchain
     max = 0
     max_ip = None
     for ip in Variables.PEER_NODES:
@@ -26,12 +27,14 @@ def consensus():
             max_ip = ip
     for i in range(0,max-1):
         url = "http://" + max_ip + ":" + str(Variables.PORT) + "/block?block_number={}".format(i)
-        print(url)
         block_xml = requests.post(url)
         parsed = xmltodict.parse(block_xml.content)
         block = Block()
         block.import_from_xml(parsed['block'])
-        blockchain.add(block)
+        if blockchain is None:
+            blockchain = Blockchain(block)
+        else:
+            blockchain.add(block)
         print("added",i)
 
 
@@ -74,7 +77,20 @@ def block():
         b.import_from_xml(parsed['block'])
         blockchain.add(b)
     else:
-        block_number = int(request.args['block_number'])
-        return blockchain.get(block_number).export_to_xml()
+        block_number = None
+        try:
+            block_number = int(request.args['block_number'])
+        except:
+            pass
+        if block_number is not None:
+            return blockchain.get(block_number).export_to_xml()
+        else:
+            raw = request.data.decode('utf-8')
+            parsed = xmltodict.parse(raw)
+            b = Block()
+            b.import_from_xml(parsed['block'])
+            if Utility.validate(b):
+                blockchain.add(b)
+
 
     return "0\n"
