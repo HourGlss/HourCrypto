@@ -15,8 +15,19 @@ node = Flask(__name__)
 
 
 def consensus():
+    max = 0
+    max_ip = None
     for ip in Variables.PEER_NODES:
-        pass
+        url = "http://" + ip + ":" + str(Variables.PORT) + "/numblocks"
+        numblocks = requests.post(url)
+        numblocks = int(numblocks.content.decode('utf-8'))
+        if numblocks > max:
+            max = numblocks
+            max_ip = ip
+    for i in range(max):
+        url = "http://" + max_ip + ":" + str(Variables.PORT) + "/block?block_number={}".format(i)
+        requests.post(url)
+
 
 
 def start():
@@ -25,7 +36,7 @@ def start():
         genesis = Utility.create_genesis_block()
         blockchain = Blockchain(genesis)
     else:
-        blockchain = consensus()
+        consensus()
     node.config['SECRET_KEY'] = Utility.createHexdigest(User.password)
     node.run(host="0.0.0.0", port=Variables.PORT)
 
@@ -45,11 +56,11 @@ def lastblock():
     block = blockchain.last_added()
     return block.export_to_xml()
 
-@node.route('/block', methods=['GET', 'POST'])
+@node.route('/block', methods=['POST'])
 def block():
     global blockchain
     ip = request.remote_addr
-    if request.method == 'POST':
+    if ip == '127.0.0.1':
 
         raw = request.data.decode('utf-8')
         parsed = xmltodict.parse(raw)
@@ -57,6 +68,7 @@ def block():
         b.import_from_xml(parsed['block'])
         blockchain.add(b)
     else:
-        block_number = str(int(request.args['block_number']))
+        block_number = int(request.args['block_number'])
+        return blockchain.get(block_number).export_to_xml()
 
     return "0\n"

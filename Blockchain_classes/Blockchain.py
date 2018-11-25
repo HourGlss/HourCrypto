@@ -49,12 +49,19 @@ class Blockchain():
                 print("total of {}".format(self.__added_to_db))
             print("Done reloading")
 
-
-
-
-
-
-
+    def get(self,number):
+        self.cursor.execute("SELECT * FROM verified_blocks WHERE `index` = ?", (number,))
+        verified_response = self.cursor.fetchone()
+        if verified_response is not None:
+            b = Block()
+            b.import_from_database(verified_response)
+            return b
+        self.cursor.execute("SELECT * FROM unverified_blocks WHERE `index` = ?", (number,))
+        unverified_response = self.cursor.fetchone()
+        if unverified_response is not None:
+            b = Block()
+            b.import_from_database(unverified_response)
+            return b
 
     def add(self,block,update_db = True):
         func = inspect.currentframe().f_back.f_code
