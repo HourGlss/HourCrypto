@@ -14,20 +14,24 @@ blockchain = None
 node = Flask(__name__)
 
 
+def consensus():
+    for ip in Variables.PEER_NODES:
+        pass
+
+
 def start():
     global node, blockchain
     if not len(Variables.PEER_NODES) > 0:
         genesis = Utility.create_genesis_block()
         blockchain = Blockchain(genesis)
+    else:
+        blockchain = consensus()
     node.config['SECRET_KEY'] = Utility.createHexdigest(User.password)
     node.run(host="0.0.0.0", port=Variables.PORT)
 
 
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
-
-
-
 
 
 @node.route('/numblocks', methods=['GET','POST'])
@@ -52,7 +56,6 @@ def block():
         b = Block()
         b.import_from_xml(parsed['block'])
         blockchain.add(b)
-        b = None
     else:
         block_number = str(int(request.args['block_number']))
 
