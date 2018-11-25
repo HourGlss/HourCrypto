@@ -24,9 +24,15 @@ def consensus():
         if numblocks > max:
             max = numblocks
             max_ip = ip
-    for i in range(max):
+    for i in range(0,max-1):
         url = "http://" + max_ip + ":" + str(Variables.PORT) + "/block?block_number={}".format(i)
-        requests.post(url)
+        print(url)
+        block_xml = requests.post(url)
+        parsed = xmltodict.parse(block_xml.content)
+        block = Block()
+        block.import_from_xml(parsed['block'])
+        blockchain.add(block)
+        print("added",i)
 
 
 
