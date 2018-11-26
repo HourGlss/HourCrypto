@@ -56,6 +56,9 @@ log.setLevel(logging.ERROR)
 
 @node.route('/numblocks', methods=['GET','POST'])
 def numblocks():
+    ip = request.remote_addr
+    if ip not in Variables.PEER_NODES:
+        Variables.PEER_NODES.append(ip)
     global blockchain
     return str(blockchain.num_added())
 
@@ -63,6 +66,8 @@ def numblocks():
 def lastblock():
     global blockchain
     ip = request.remote_addr
+    if ip not in Variables.PEER_NODES:
+        Variables.PEER_NODES.append(ip)
     if ip == "127.0.0.1":
         block = blockchain.last_added()
         return block.export_to_xml()
@@ -70,8 +75,11 @@ def lastblock():
 
 @node.route('/block', methods=['POST'])
 def block():
+
     global blockchain
     ip = request.remote_addr
+    if ip not in Variables.PEER_NODES:
+        Variables.PEER_NODES.append(ip)
     if ip == '127.0.0.1':
 
         raw = request.data.decode('utf-8')
@@ -79,6 +87,13 @@ def block():
         b = Block()
         b.import_from_xml(parsed['block'])
         blockchain.add(b)
+
+        #Distribute the block to our peers
+        for peer in Variables.PEER_NODES:
+            url = "http://" + peer + ":" + str(Variables.PORT) + "/block"
+            xml = b.export_to_xml()
+            headers = {'Content-Type': 'application/xml'}
+            resp = requests.post(url, data=xml, headers=headers).text
     else:
         block_number = None
 
@@ -95,9 +110,6 @@ def block():
             b.import_from_xml(parsed['block'])
             print("received a block", b.index)
             if Utility.validate(b):
-                if ip not in Variables.PEER_NODES:
-                    Variables.PEER_NODES.append(ip)
-                    print("adding new peer",ip)
                 blockchain.add(b)
             else:
                 print("Block did not validate",ip)
