@@ -81,6 +81,7 @@ def block():
         blockchain.add(b)
     else:
         block_number = None
+
         try:
             block_number = int(request.args['block_number'])
         except:
