@@ -35,7 +35,7 @@ def consensus():
             blockchain = Blockchain(block)
         else:
             blockchain.add(block)
-        print("added",i)
+
 
 
 
@@ -97,5 +97,8 @@ def block():
             if Utility.validate(b):
                 if ip not in Variables.PEER_NODES:
                     Variables.PEER_NODES.append(ip)
+                    print("adding new peer",ip)
                 blockchain.add(b)
+            else:
+                print("Block did not validate",ip)
     return "0"

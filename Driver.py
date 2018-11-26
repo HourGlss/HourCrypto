@@ -4,7 +4,8 @@ FORMAT = "[{%(levelname)s} %(filename)s:%(lineno)s 	- %(funcName)20s() ] %(messa
 logging.basicConfig(filename='runlog.log', level=logging.DEBUG, format=FORMAT)
 import Mining_classes.Mining as Mining
 import Web.Endpoints as Web
-from multiprocessing import Process, Queue
+from multiprocessing import Process
+import sys
 def welcome_msg():
 
     print("""       =========================================\n
