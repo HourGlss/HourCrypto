@@ -62,8 +62,11 @@ def numblocks():
 @node.route('/lastblock', methods=['GET', 'POST'])
 def lastblock():
     global blockchain
-    block = blockchain.last_added()
-    return block.export_to_xml()
+    ip = request.remote_addr
+    if ip is "127.0.0.1":
+        block = blockchain.last_added()
+        return block.export_to_xml()
+    return "0"
 
 @node.route('/block', methods=['POST'])
 def block():
@@ -90,7 +93,7 @@ def block():
             b = Block()
             b.import_from_xml(parsed['block'])
             if Utility.validate(b):
+                if ip not in Variables.PEER_NODES:
+                    Variables.PEER_NODES.append(ip)
                 blockchain.add(b)
-
-
-    return "0\n"
+    return "0"

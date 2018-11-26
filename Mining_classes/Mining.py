@@ -31,8 +31,7 @@ def mine():
     func = inspect.currentframe().f_back.f_code
     # See if other blockchains exist
     # TODO add consensus back
-    i = 0
-    while i < 100:
+    while True:
         url = "http://" + Variables.MINER_NODE_URL + ":" + str(Variables.PORT) + "/lastblock"
         last_block_xml = requests.post(url)
         parsed = xmltodict.parse(last_block_xml.content)
@@ -46,5 +45,3 @@ def mine():
         xml = pow_output.export_to_xml()
         headers = {'Content-Type': 'application/xml'}
         resp = requests.post(url, data=xml, headers=headers).text
-        i+=1
-    print("done")
