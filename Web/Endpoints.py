@@ -63,7 +63,7 @@ def numblocks():
 def lastblock():
     global blockchain
     ip = request.remote_addr
-    if ip is "127.0.0.1":
+    if ip == "127.0.0.1":
         block = blockchain.last_added()
         return block.export_to_xml()
     return "0"
