@@ -93,6 +93,7 @@ def block():
             parsed = xmltodict.parse(raw)
             b = Block()
             b.import_from_xml(parsed['block'])
+            print("received a block", b.index)
             if Utility.validate(b):
                 if ip not in Variables.PEER_NODES:
                     Variables.PEER_NODES.append(ip)

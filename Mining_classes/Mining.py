@@ -45,3 +45,4 @@ def mine():
         xml = pow_output.export_to_xml()
         headers = {'Content-Type': 'application/xml'}
         resp = requests.post(url, data=xml, headers=headers).text
+        print("Farmed a block",pow_output.index)
