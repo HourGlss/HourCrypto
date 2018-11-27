@@ -24,9 +24,9 @@ def create_genesis_block():
     # logging.info("Returning block: {}".format(b))
     return b
 
-def buildpow(index,timestamp,effort,data,previous_hash):
+def buildpow(index,timestamp,proof_of_work,effort,data,previous_hash):
     m = hashlib.sha256()
-    m.update((str(index) + str(timestamp) + str(effort) + str(data) + str(previous_hash)).encode('utf-8'))
+    m.update((str(index) + str(timestamp) +str(proof_of_work)+ str(effort) + str(data) + str(previous_hash)).encode('utf-8'))
     return m
 
 def validate(block):
@@ -37,16 +37,8 @@ def validate(block):
     if block.index == 0:
         logging.debug("Block validated good")
         return True
-    generated_hash = buildpow(block.index,block.timemade,block.effort,block.transactions,block.previous_hash)
-    '''
-    self.index = int(listinfo[0])
-        self.timemade = str(listinfo[1])
-        self.proof_of_work = str(listinfo[2])
-        self.effort = str(listinfo[3])
-        self.transactions = pickle.loads(listinfo[4])
-        self.previous_hash = str(listinfo[6])
-        self.hash = self.hash_block()
-    '''
+    generated_hash = buildpow(block.index,block.timemade,block.proof_of_work,block.effort,block.transactions,block.previous_hash)
+
     if block.hash == generated_hash.hexdigest():
         logging.debug("Block validated good")
         return True
