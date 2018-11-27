@@ -119,6 +119,8 @@ def block():
             if Utility.validate(b):
                 blockchain.add(b)
                 mining_process.terminate()
+                mining_process = None
+                mining_process = Process(target=Mining.mine)
                 mining_process.start()
             else:
                 print("Block did not validate",ip)
