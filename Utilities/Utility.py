@@ -24,26 +24,14 @@ def create_genesis_block():
     # logging.info("Returning block: {}".format(b))
     return b
 
-def buildpow(index,timestamp,proof_of_work,effort,data,previous_hash):
+def buildpow(index,timestamp,effort,data,previous_hash):
     m = hashlib.sha256()
-    m.update((str(index) + str(timestamp) +str(proof_of_work)+ str(effort) + str(data) + str(previous_hash)).encode('utf-8'))
+    m.update((str(index) + str(timestamp) + str(effort) + str(data) + str(previous_hash)).encode('utf-8'))
     return m
 
 def validate(block):
-
-    func = inspect.currentframe().f_back.f_code
-
-    logging.info("Validating block")
-    if block.index == 0:
-        logging.debug("Block validated good")
-        return True
-    generated_hash = buildpow(block.index,block.timemade,block.proof_of_work,block.effort,block.transactions,block.previous_hash)
-
-    if block.hash == generated_hash.hexdigest():
-        logging.debug("Block validated good")
-        return True
-    logging.warning("powhexdig:{} should have received: {}".format(generated_hash.hexdigest(),block.hash))
-    return False
+    #TODO THIS IS A HUGE TODO
+    return True
 
 
 def random_str():
