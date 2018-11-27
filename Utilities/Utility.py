@@ -33,10 +33,6 @@ def validate(block):
 
     func = inspect.currentframe().f_back.f_code
 
-    if not leadingzeroes(block.proof_of_work) >= Variables.WORK:
-        logging.debug("Proof of work failed")
-        return False
-
     logging.info("Validating block")
     if block.index == 0:
         logging.debug("Block validated good")
