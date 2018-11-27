@@ -43,7 +43,16 @@ def validate(block):
     if block.index == 0:
         logging.debug("Block validated good")
         return True
-    generaged_proof_of_work = buildpow(block.index,block.timestamp,block.effort,block.data,block.previous_hash)
+    generaged_proof_of_work = buildpow(block.index,block.timemade,block.effort,block.transactions,block.previous_hash)
+    '''
+    self.index = int(listinfo[0])
+        self.timemade = str(listinfo[1])
+        self.proof_of_work = str(listinfo[2])
+        self.effort = str(listinfo[3])
+        self.transactions = pickle.loads(listinfo[4])
+        self.previous_hash = str(listinfo[6])
+        self.hash = self.hash_block()
+    '''
     if block.proof_of_work == generaged_proof_of_work.hexdigest():
         logging.debug("Block validated good")
         return True

@@ -84,7 +84,7 @@ def lastblock():
 @node.route('/block', methods=['POST'])
 def block():
 
-    global blockchain,mining_process
+    global blockchain
     ip = request.remote_addr
     if ip != "127.0.0.1" and ip not in Variables.PEER_NODES:
         Variables.PEER_NODES.append(ip)
@@ -117,11 +117,14 @@ def block():
             b.import_from_xml(parsed['block'])
             print("received a block", b.index)
             if Utility.validate(b):
+                global mining_process
                 blockchain.add(b)
+                print("This ran")
                 mining_process.terminate()
                 mining_process = None
                 mining_process = Process(target=Mining.mine)
                 mining_process.start()
+                print("does This run")
             else:
                 print("Block did not validate",ip)
     return "0"
