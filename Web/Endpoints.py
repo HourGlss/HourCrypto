@@ -9,9 +9,13 @@ from Blockchain_classes.Block import Block
 import Utilities.Utility as Utility
 import User_classes.User as User
 import Mining_classes.Variables as Variables
+import Mining_classes.Mining as Mining
+
+from multiprocessing import Process
 
 blockchain = None
 node = Flask(__name__)
+mining_process = None
 
 
 def consensus():
@@ -46,6 +50,10 @@ def start():
         blockchain = Blockchain(genesis)
     else:
         consensus()
+    print("Starting to mine")
+    mining_process = Process(target=Mining.mine)
+    mining_process.start()
+    logging.debug("Mining_classes Started")
     node.config['SECRET_KEY'] = Utility.createHexdigest(User.password)
     node.run(host="0.0.0.0", port=Variables.PORT)
 
@@ -57,7 +65,7 @@ log.setLevel(logging.ERROR)
 @node.route('/numblocks', methods=['GET','POST'])
 def numblocks():
     ip = request.remote_addr
-    if ip not in Variables.PEER_NODES:
+    if ip != "127.0.0.1" and ip not in Variables.PEER_NODES:
         Variables.PEER_NODES.append(ip)
     global blockchain
     return str(blockchain.num_added())
@@ -66,7 +74,7 @@ def numblocks():
 def lastblock():
     global blockchain
     ip = request.remote_addr
-    if ip not in Variables.PEER_NODES:
+    if ip != "127.0.0.1" and ip not in Variables.PEER_NODES:
         Variables.PEER_NODES.append(ip)
     if ip == "127.0.0.1":
         block = blockchain.last_added()
@@ -76,12 +84,11 @@ def lastblock():
 @node.route('/block', methods=['POST'])
 def block():
 
-    global blockchain
+    global blockchain,mining_process
     ip = request.remote_addr
-    if ip not in Variables.PEER_NODES:
+    if ip != "127.0.0.1" and ip not in Variables.PEER_NODES:
         Variables.PEER_NODES.append(ip)
     if ip == '127.0.0.1':
-
         raw = request.data.decode('utf-8')
         parsed = xmltodict.parse(raw)
         b = Block()
@@ -111,6 +118,8 @@ def block():
             print("received a block", b.index)
             if Utility.validate(b):
                 blockchain.add(b)
+                mining_process.terminate()
+                mining_process.start()
             else:
                 print("Block did not validate",ip)
     return "0"
