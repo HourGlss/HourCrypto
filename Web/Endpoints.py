@@ -116,7 +116,7 @@ def block():
             parsed = xmltodict.parse(raw)
             b = Block()
             b.import_from_xml(parsed['block'])
-            print("received", b)
+            print("receiv", b)
             if Utility.validate(b):
                 global mining_process
                 blockchain.add(b)
