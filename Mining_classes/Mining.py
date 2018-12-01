@@ -37,7 +37,6 @@ def get_last_block():
 
 
 def mine():
-    print("Started this again")
     func = inspect.currentframe().f_back.f_code
     while True:
         transactions = [{"from": "network", "to": User.public_key, "amount": 1}]
@@ -49,4 +48,3 @@ def mine():
         xml = pow_output.export_to_xml()
         headers = {'Content-Type': 'application/xml'}
         resp = requests.post(url, data=xml, headers=headers).text
-        print("Farmed a block", pow_output.index)

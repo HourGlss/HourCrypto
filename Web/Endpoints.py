@@ -93,6 +93,7 @@ def block():
         parsed = xmltodict.parse(raw)
         b = Block()
         b.import_from_xml(parsed['block'])
+        print("I made", b)
         blockchain.add(b)
 
         #Distribute the block to our peers
@@ -115,16 +116,14 @@ def block():
             parsed = xmltodict.parse(raw)
             b = Block()
             b.import_from_xml(parsed['block'])
-            print("received a block", b.index)
+            print("received", b)
             if Utility.validate(b):
                 global mining_process
                 blockchain.add(b)
-                print("This ran")
                 mining_process.terminate()
                 mining_process = None
                 mining_process = Process(target=Mining.mine)
                 mining_process.start()
-                print("does This run")
             else:
                 print("Block did not validate",ip)
     return "0"

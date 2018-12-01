@@ -101,11 +101,11 @@ class BaseBlock(object):
     def __repr__(self):
         # def __init__(self, index, timemade, pow, effort,data, previous_hash):
         return "i:{},time:{},proof:{},effort:{},hash:{},previous:{})".format(self.index, self.timemade, self.proof_of_work, self.effort,
-                                                             self.hash,self.previous_hash)
+                                                             self.hash[-4:],self.previous_hash[-4:])
 
     def __str__(self):
-        return repr(self)
-        # return "hash: {} previous: {}".format(self.hash, self.previous_hash)
+        #return repr(self)
+        return "hash: {} prev: {}".format(self.hash[-4:], self.previous_hash[-4:])
 
     '''
     def __str__(self):

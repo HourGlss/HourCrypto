@@ -3,16 +3,16 @@ FORMAT = "[{%(levelname)s} %(filename)s:%(lineno)s 	- %(funcName)20s() ] %(messa
 logging.basicConfig(filename='scratch.log', level=logging.DEBUG, format=FORMAT)
 from Blockchain_classes.Blockchain import Blockchain
 import time
-
+from Blockchain_classes.Block import Block
 import User_classes.User as User
 import Utilities.Utility as Utility
 
-WORK = 9
+WORK = 5
 genesis = Utility.create_genesis_block()
 
 added = 0
 
-blockchain = Blockchain(genesis.index,genesis.timemade,genesis.proof_of_work,genesis.effort,genesis.transactions,genesis.previous_hash)
+blockchain = Blockchain(genesis)
 while added < 100:
     last_block = blockchain.last_added()
 
@@ -30,7 +30,9 @@ while added < 100:
         if leading_zeroes >= WORK:
             done = True
     added +=1
-    blockchain.add(last_block.index + 1, now, pow_hash_object.hexdigest(), effort, data, last_block.hash)
+    b = Block(last_block.index + 1, now, pow_hash_object.hexdigest(), effort, data, last_block.hash)
+    blockchain.add(b)
+    print("farmed",b)
 
 print(str(blockchain))
 
