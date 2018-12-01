@@ -50,7 +50,7 @@ def start():
         blockchain = Blockchain(genesis)
     else:
         consensus()
-    print("Starting to mine")
+
     mining_process = Process(target=Mining.mine)
     mining_process.start()
     logging.debug("Mining_classes Started")

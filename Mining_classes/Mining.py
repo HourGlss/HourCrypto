@@ -37,6 +37,7 @@ def get_last_block():
 
 
 def mine():
+    print("Starting to mine")
     func = inspect.currentframe().f_back.f_code
     while True:
         transactions = [{"from": "network", "to": User.public_key, "amount": 1}]
