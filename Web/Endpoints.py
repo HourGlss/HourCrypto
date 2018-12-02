@@ -15,7 +15,7 @@ from multiprocessing import Process
 
 blockchain = None
 node = Flask(__name__)
-working_node = None
+mining_process = None
 
 
 def consensus():
@@ -50,6 +50,7 @@ def start():
         blockchain = Blockchain(genesis)
     else:
         consensus()
+
 
     mining_process = Process(target=Mining.mine)
     mining_process.start()
@@ -118,10 +119,12 @@ def block():
             b.import_from_xml(parsed['block'])
             print("receiv", b)
             if Utility.validate(b):
-                global working_node
+                global mining_process
                 blockchain.add(b)
-                working_node.terminate()
-                working_node.start()
+                mining_process.terminate()
+                mining_process = None
+                mining_process = Process(target=Mining.mine)
+                mining_process.start()
             else:
                 print("Block did not validate",ip)
     return "0"

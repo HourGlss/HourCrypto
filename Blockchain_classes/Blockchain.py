@@ -65,6 +65,7 @@ class Blockchain():
 
     def add(self,block,update_db = True):
         func = inspect.currentframe().f_back.f_code
+
         execute_sql = False
         if self.__root is None:
             execute_sql = True
@@ -81,6 +82,7 @@ class Blockchain():
 
         self.__set_last_added(block)
         if execute_sql and update_db:
+            print("adding", block, "to db")
             dict_to_use = block.get_block_as_dictionary()
             self.cursor.execute(
                 "INSERT INTO unverified_blocks VALUES (:index,:timemade,:proof_of_work,:effort,:transactions,:hash,:previous_hash)",
