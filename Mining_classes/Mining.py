@@ -8,15 +8,18 @@ import User_classes.User as User
 
 import inspect
 import logging
-
+event = None
 
 def proof_of_work(last_block,data):
+    global event
     func = inspect.currentframe().f_back.f_code
     done = False
     now = None
     pow_hash_object = None
     effort = None
     while not done:
+        if event.is_set():
+            return False
         now = time.time()
         index_to_use = last_block.index + 1
         effort, pow_hash_object = Utility.genhash(index_to_use, now, data, last_block.hash)
@@ -36,16 +39,22 @@ def get_last_block():
     return last_block
 
 
-def mine():
-    print("Starting to mine")
+def mine(e):
+    global event
+    event = e
+
     func = inspect.currentframe().f_back.f_code
     while True:
+        if event.is_set():
+            event.clear()
         transactions = [{"from": "network", "to": User.public_key, "amount": 1}]
         # TODO get REAL transactions from transaction db
         last_block = get_last_block()
         pow_output = proof_of_work(last_block,transactions)
-        transactions = [{}]
-        url = "http://" + Variables.MINER_NODE_URL + ":" + str(Variables.PORT) + "/block"
-        xml = pow_output.export_to_xml()
-        headers = {'Content-Type': 'application/xml'}
-        resp = requests.post(url, data=xml, headers=headers).text
+        if not pow_output:
+            continue
+        else:
+            url = "http://" + Variables.MINER_NODE_URL + ":" + str(Variables.PORT) + "/block"
+            xml = pow_output.export_to_xml()
+            headers = {'Content-Type': 'application/xml'}
+            resp = requests.post(url, data=xml, headers=headers).text

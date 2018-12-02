@@ -4,7 +4,7 @@ FORMAT = "[{%(levelname)s} %(filename)s:%(lineno)s 	- %(funcName)20s() ] %(messa
 logging.basicConfig(filename='runlog.log', level=logging.DEBUG, format=FORMAT)
 
 import Web.Endpoints as Web
-from multiprocessing import Process
+from multiprocessing import Process, Event
 import sys
 def welcome_msg():
 
@@ -16,8 +16,10 @@ def welcome_msg():
 if __name__ == '__main__':
 
     logging.debug("Display welcome")
+
     welcome_msg()
-    p2 = Process(target=Web.start)
+    e = Event()
+    web_process = Process(target=Web.start,args=(e,))
     logging.debug("Starting the web")
-    p2.start()
+    web_process.start()
     logging.debug("Web started")

@@ -16,7 +16,7 @@ from multiprocessing import Process
 blockchain = None
 node = Flask(__name__)
 mining_process = None
-
+event = None
 
 def consensus():
     global blockchain
@@ -29,7 +29,7 @@ def consensus():
         if numblocks > max:
             max = numblocks
             max_ip = ip
-    for i in range(0,max-1):
+    for i in range(0,max):
         url = "http://" + max_ip + ":" + str(Variables.PORT) + "/block?block_number={}".format(i)
         block_xml = requests.post(url)
         parsed = xmltodict.parse(block_xml.content)
@@ -43,16 +43,16 @@ def consensus():
 
 
 
-def start():
-    global node, blockchain,mining_process
+def start(e):
+    global node, blockchain,mining_process,event
     if not len(Variables.PEER_NODES) > 0:
         genesis = Utility.create_genesis_block()
         blockchain = Blockchain(genesis)
     else:
         consensus()
 
-
-    mining_process = Process(target=Mining.mine)
+    event = e
+    mining_process = Process(target=Mining.mine, args=(event,))
     mining_process.start()
     logging.debug("Mining_classes Started")
     node.config['SECRET_KEY'] = Utility.createHexdigest(User.password)
@@ -123,12 +123,9 @@ def block():
             b.import_from_xml(parsed['block'])
             print("receiv", b)
             if Utility.validate(b):
-                global mining_process
                 blockchain.add(b)
-                mining_process.terminate()
-                mining_process = None
-                mining_process = Process(target=Mining.mine)
-                mining_process.start()
+                global event
+                event.set()
             else:
                 print("Block did not validate",ip)
     return "0"
