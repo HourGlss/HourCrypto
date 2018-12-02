@@ -98,11 +98,15 @@ def block():
         blockchain.add(b)
 
         #Distribute the block to our peers
+
         for peer in Variables.PEER_NODES:
-            url = "http://" + peer + ":" + str(Variables.PORT) + "/block"
-            xml = b.export_to_xml()
-            headers = {'Content-Type': 'application/xml'}
-            resp = requests.post(url, data=xml, headers=headers).text
+            try:
+                url = "http://" + peer + ":" + str(Variables.PORT) + "/block"
+                xml = b.export_to_xml()
+                headers = {'Content-Type': 'application/xml'}
+                resp = requests.post(url, data=xml, headers=headers).text
+            except:
+                Variables.PEER_NODES.remove(peer)
     else:
         block_number = None
 
