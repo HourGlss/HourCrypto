@@ -19,6 +19,7 @@ def proof_of_work(last_block,data):
     effort = None
     while not done:
         if event.is_set():
+            print("Exiting block creation")
             return False
         now = time.time()
         index_to_use = last_block.index + 1
