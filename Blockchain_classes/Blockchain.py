@@ -65,7 +65,6 @@ class Blockchain():
 
     def add(self,block,update_db = True):
         func = inspect.currentframe().f_back.f_code
-
         execute_sql = False
         if self.__root is None:
             execute_sql = True
