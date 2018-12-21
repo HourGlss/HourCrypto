@@ -18,12 +18,6 @@ node = Flask(__name__)
 mining_process = None
 event = None
 
-
-
-@node.route("/", methods=['GET', 'POST'])
-def index():
-    return render_template("index.html")
-
 def consensus():
     global blockchain
     max = 0
