@@ -3,6 +3,9 @@ a re-design of SimpleCoin
 
 Currently __unfunctional__.
 
+**Tracking**
+https://trello.com/b/PZSadgSB/hourcrypto
+
 
 Documentation will be created once development on current work is done. Done is defined as "networked mining possible."
 

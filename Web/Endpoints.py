@@ -63,6 +63,19 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 
+@node.route('/connections', methods=['GET','POST'])
+def connection():
+    ip = request.remote_addr
+    if ip != "127.0.0.1" and ip not in Variables.PEER_NODES:
+        Variables.PEER_NODES.append(ip)
+    if request.method == "POST":
+        #INCOMING
+
+        pass
+    else:
+        #OUTGOING
+        pass
+
 @node.route('/numblocks', methods=['GET','POST'])
 def numblocks():
     ip = request.remote_addr
