@@ -1,7 +1,7 @@
 # HourCrypto
 a re-design of SimpleCoin
 
-Currently __functional__.
+Currently __unfunctional__.
 
 
 Documentation will be created once development on current work is done. Done is defined as "networked mining possible."
